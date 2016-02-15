@@ -1,0 +1,20 @@
+{
+  "name": "springHmac",
+  "version": "0.0.1",
+  "appPath": "src/main/webapp",
+  "dependencies": {
+    "angular": "1.5.0",
+    "angular-cookies": "1.5.0",
+    "angular-resource": "1.5.0",
+    "angular-sanitize": "1.5.0",
+    "angular-route": "1.5.0",
+    "bootstrap":"3.3.6",
+    "jquery": "1.11.3",
+    "cryptoJS":"https://github.com/brix/crypto-js/archive/3.1.6.zip",
+    "angular-utf8-base64": "0.0.5",
+    "underscore": "1.8.3"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.5.0"
+  }
+}

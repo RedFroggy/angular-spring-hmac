@@ -1,0 +1,27 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel">
+                <div class="panel-body">
+                    <span class="label label-danger" ng-show="wrongCredentials">
+                            Username and/or password are invalid !
+                        </span>
+                    <form class="form" name="form" role="form" ng-submit="authenticate()">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" required ng-model="username"
+                                   name="username" id="username" placeholder="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" required ng-model="password"
+                                   name="password" id="password" placeholder="password">
+                        </div>
+                        <button type="submit" ng-disabled="form.$invalid" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

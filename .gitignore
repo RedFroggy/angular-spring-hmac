@@ -1,0 +1,4 @@
+src/main/webapp/bower_compoents/
+target/
+.idea/
+*.iml
