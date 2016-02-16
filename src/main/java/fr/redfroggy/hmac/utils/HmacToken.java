@@ -1,7 +1,5 @@
 package fr.redfroggy.hmac.utils;
 
-import java.util.List;
-
 /**
  * HMAC Token
  * Created by Michael DESIGAUD on 15/02/2016.

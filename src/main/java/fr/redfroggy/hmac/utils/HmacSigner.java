@@ -25,7 +25,16 @@ public class HmacSigner {
 
     public static final String ENCODING_CLAIM_PROPERTY = "l-lev";
 
-    public static HmacToken getSignedToken(String iss, Map<String,String> claims) throws Exception{
+    /**
+     * Get a signed JWT
+     * The issuer (user id) and the custom properties are stored in the JWT
+     * to be retrieve later
+     * @param iss issuer (user identifier)
+     * @param claims Custom properties to store in the JWT
+     * @return HmacToken instance
+     * @throws HmacException
+     */
+    public static HmacToken getSignedToken(String iss, Map<String,String> claims) throws HmacException{
 
         //Generate a random token
         String token = generateToken();
@@ -49,14 +58,15 @@ public class HmacSigner {
 
     /**
      * Generate a random secret (base on uuid) and encoded in base 64
+     * @throws HmacException
      * @return a random secret
      */
-    private static String generateSecret() throws Exception {
+    private static String generateSecret() throws HmacException {
         try {
             return Base64.encodeBase64String(generateToken().getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            throw new Exception("Cannot encode base64",e);
+            throw new HmacException("Cannot encode base64",e);
         }
     }
 
@@ -68,12 +78,12 @@ public class HmacSigner {
      * @param claims List of custom claims
      * @return Signed JWT
      */
-    private static String generateJWT(String secret, String token,String iss, Map<String,String> claims) throws Exception{
+    private static String generateJWT(String secret, String token,String iss, Map<String,String> claims) throws HmacException{
         try {
             return signJWT(secret,token,180,iss,claims);
         } catch (JOSEException e) {
             e.printStackTrace();
-            throw new Exception("Cannot generate JWT",e);
+            throw new HmacException("Cannot generate JWT",e);
         }
     }
 
@@ -120,16 +130,16 @@ public class HmacSigner {
      * @param jwt      json web token
      * @param claimKey claim key of the property to retrieve
      * @return property value
-     * @throws Exception
+     * @throws HmacException
      */
-    public static String getJwtClaim(final String jwt, final String claimKey) throws Exception {
+    public static String getJwtClaim(final String jwt, final String claimKey) throws HmacException {
         try {
             //Parse jwt string
             SignedJWT signedJWT = SignedJWT.parse(jwt);
             Object customClaim = signedJWT.getJWTClaimsSet().getClaim(claimKey);
             return customClaim != null ? String.valueOf(customClaim) : null;
         } catch (ParseException ex) {
-            throw new Exception("The claim property: " + claimKey + " is missing", ex);
+            throw new HmacException("The claim property: " + claimKey + " is missing", ex);
         }
     }
 
@@ -138,16 +148,16 @@ public class HmacSigner {
      *
      * @param jwt json web token
      * @return iss property from claim
-     * @throws Exception
+     * @throws HmacException
      */
-    public static String getJwtIss(final String jwt) throws Exception {
+    public static String getJwtIss(final String jwt) throws HmacException {
         try {
             //Parse jwt string
             SignedJWT signedJWT = SignedJWT.parse(jwt);
             //Return the claim property value
             return String.valueOf(signedJWT.getJWTClaimsSet().getIssuer());
         } catch (ParseException ex) {
-            throw new Exception("The iss property is missing", ex);
+            throw new HmacException("The iss property is missing", ex);
         }
     }
 
@@ -158,9 +168,9 @@ public class HmacSigner {
      * @param message   message to sign
      * @param algorithm algorithm ued to sign
      * @return an HMAC encoded string
-     * @throws Exception
+     * @throws HmacException
      */
-    public static String encodeMac(final String secret, final String message, final String algorithm) throws Exception {
+    public static String encodeMac(final String secret, final String message, final String algorithm) throws HmacException {
         String digest;
         try {
             SecretKeySpec key = new SecretKeySpec(secret.getBytes("UTF-8"), algorithm);
@@ -179,7 +189,7 @@ public class HmacSigner {
             }
             digest = hash.toString();
         } catch (Exception ex) {
-            throw new Exception("Error while encoding request with hmac", ex);
+            throw new HmacException("Error while encoding request with hmac", ex);
         }
         return digest;
     }

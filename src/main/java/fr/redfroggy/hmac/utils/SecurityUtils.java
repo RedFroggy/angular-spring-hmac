@@ -1,11 +1,5 @@
 package fr.redfroggy.hmac.utils;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-import org.joda.time.DateTime;
-
 /**
  * Security utility class
  * Created by Michael DESIGAUD on 15/02/2016.

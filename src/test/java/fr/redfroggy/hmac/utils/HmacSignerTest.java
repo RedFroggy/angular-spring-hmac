@@ -18,7 +18,7 @@ import java.util.Map;
 public class HmacSignerTest {
 
     @Test
-    public void getSignedToken() throws Exception{
+    public void getSignedToken() throws HmacException{
         HmacToken hmacToken = HmacSigner.getSignedToken("1",null);
         Assert.assertNotNull(hmacToken);
         Assert.assertNotNull(hmacToken.getJwt());
@@ -27,7 +27,7 @@ public class HmacSignerTest {
     }
 
     @Test
-    public void getJwtClaim() throws Exception {
+    public void getJwtClaim() throws HmacException {
         Map<String,String> claims = new HashMap<String, String>(){
             {
                 put(HmacSigner.ENCODING_CLAIM_PROPERTY,"claimValue");
@@ -49,7 +49,7 @@ public class HmacSignerTest {
     }
 
     @Test
-    public void getJwtIss() throws Exception{
+    public void getJwtIss() throws HmacException{
         String userId = "1";
         HmacToken hmacToken = HmacSigner.getSignedToken(userId,null);
         Assert.assertNotNull(hmacToken);
@@ -63,7 +63,7 @@ public class HmacSignerTest {
     }
 
     @Test
-    public void encodeMac() throws Exception{
+    public void encodeMac() throws HmacException{
         HmacToken hmacToken = HmacSigner.getSignedToken("1",null);
         Assert.assertNotNull(hmacToken);
 
@@ -72,8 +72,8 @@ public class HmacSignerTest {
         Assert.assertNotNull(encodedHmac);
     }
 
-    @Test(expected = Exception.class)
-    public void encodeMacWithWrongAlgorithm() throws Exception{
+    @Test(expected = HmacException.class)
+    public void encodeMacWithWrongAlgorithm() throws HmacException{
         HmacToken hmacToken = HmacSigner.getSignedToken("1",null);
         Assert.assertNotNull(hmacToken);
 

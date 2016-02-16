@@ -4,6 +4,7 @@ import fr.redfroggy.hmac.configuration.security.SecurityUser;
 import fr.redfroggy.hmac.dto.LoginDTO;
 import fr.redfroggy.hmac.dto.UserDTO;
 import fr.redfroggy.hmac.mock.MockUsers;
+import fr.redfroggy.hmac.utils.HmacException;
 import fr.redfroggy.hmac.utils.HmacSigner;
 import fr.redfroggy.hmac.utils.HmacToken;
 import fr.redfroggy.hmac.utils.SecurityUtils;
@@ -37,7 +38,21 @@ public class AuthenticationService {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    public UserDTO authenticate(LoginDTO loginDTO, HttpServletResponse response) throws Exception {
+    /**
+     * Authenticate a user in Spring Security
+     * The following headers are set in the response:
+     * - X-TokenAccess: JWT
+     * - X-Secret: Generated secret in base64 using SHA-256 algorithm
+     * - WWW-Authenticate: Used algorithm to encode secret
+     * The authenticated user in set ine the Spring Security context
+     * The generated secret is stored in a static list for every user
+     * @see MockUsers
+     * @param loginDTO credentials
+     * @param response http response
+     * @return UserDTO instance
+     * @throws HmacException
+     */
+    public UserDTO authenticate(LoginDTO loginDTO, HttpServletResponse response) throws HmacException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getLogin(),loginDTO.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -75,22 +90,30 @@ public class AuthenticationService {
         return userDTO;
     }
 
+    /**
+     * Logout a user
+     * - Clear the Spring Security context
+     * - Remove the stored UserDTO secret
+     */
     public void logout(){
         if(SecurityContextHolder.getContext().getAuthentication() != null
                 && SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
         {
             SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-            for (UserDTO userDTO : MockUsers.users) {
-                if (userDTO.getId().equals(securityUser.getId())) {
-                    userDTO.setSecretKey(null);
-                }
+            UserDTO userDTO = MockUsers.findById(securityUser.getId());
+            if(userDTO != null){
+                userDTO.setSecretKey(null);
             }
+
         }
     }
 
     /**
      * Authentication for every request
+     * - Triggered by every http request except the authentication
+     * @see fr.redfroggy.hmac.configuration.security.XAuthTokenFilter
+     * Set the authenticated user in the Spring Security context
      * @param username username
      */
     public void tokenAuthentication(String username){
