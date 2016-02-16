@@ -1,10 +1,10 @@
-package fr.redfroggy.hmac.utils;
+package fr.redfroggy.hmac.configuration.security.hmac;
 
 /**
  * Security utility class
  * Created by Michael DESIGAUD on 15/02/2016.
  */
-public class SecurityUtils {
+public class HmacUtils {
 
     public static final String HMAC_SHA_256 = "HmacSHA256";
     public static final String HMAC_SHA_1 = "HmacSHA1";
@@ -16,6 +16,7 @@ public class SecurityUtils {
     public static final String AUTHENTICATION = "Authentication";
     public static final String X_DIGEST = "X-Digest";
     public static final String X_ONCE = "X-Once";
+    public static final String X_ISS = "X-ISS";
 
 
 }

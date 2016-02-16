@@ -1,5 +1,7 @@
 package fr.redfroggy.hmac.configuration.security;
 
+import fr.redfroggy.hmac.configuration.security.hmac.HmacRequester;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacSecurityConfigurer;
 import fr.redfroggy.hmac.dto.UserDTO;
 import fr.redfroggy.hmac.mock.MockUsers;
 import fr.redfroggy.hmac.service.AuthenticationService;
@@ -39,6 +41,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private HmacRequester hmacRequester;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
@@ -69,7 +74,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .logout()
                     .permitAll()
                 .and()
-                    .apply(authTokenConfigurer());
+                    .apply(authTokenConfigurer())
+                .and()
+                    .apply(hmacSecurityConfigurer());
     }
 
     @Override
@@ -89,6 +96,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    private HmacSecurityConfigurer hmacSecurityConfigurer(){
+        return new HmacSecurityConfigurer(hmacRequester);
     }
 
     private XAuthTokenConfigurer authTokenConfigurer(){

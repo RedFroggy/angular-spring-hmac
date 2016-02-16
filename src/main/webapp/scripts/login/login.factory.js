@@ -2,31 +2,20 @@
  * Login factory
  * Created by Michael DESIGAUD on 14/02/2016.
  */
-hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope){
+hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope,hmacInterceptor){
     return {
         authenticate: function(login,password){
             return $http.post('http://localhost:8080/api/authenticate',{login:login,password:password}).success(function(user, status, headers){
                 $cookieStore.put('hmacApp-account', JSON.stringify(user));
 
-                //Retrieve headers
-                var headerList = headers();
-
-                var security = {};
-                //Secret key header
-                security["secretKey"] = headerList["x-secret"];
-                //Token header
-                security["token"] = headerList["x-tokenaccess"];
-                //Security level
-                security["securityLevel"] = headerList["www-authenticate"];
-
-                $cookieStore.put('hmacApp-security', JSON.stringify(security));
+                hmacInterceptor.readHmacRequest(headers);
 
                 $rootScope.authenticated = true;
                 return user;
             });
         },
         isAuthenticated:function(){
-            return !!$cookieStore.get('hmacApp-account') && !!$cookieStore.get('hmacApp-security');
+            return !!$cookieStore.get('hmacApp-account') && hmacInterceptor.isSecured();
         },
         isAuthorized:function(roles){
             if(!!$cookieStore.get('hmacApp-account')){
@@ -35,10 +24,15 @@ hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope){
             }
             return false;
         },
+        removeAccount:function(){
+            $cookieStore.remove('hmacApp-account');
+            hmacInterceptor.removeSecurity();
+            $rootScope.authenticated = false;
+        },
         logout: function(){
+            var self = this;
             return $http.get('http://localhost:8080/api/logout').success(function(){
-                $cookieStore.remove('hmacApp-account');
-                $cookieStore.remove('hmacApp-security');
+                self.removeAccount();
                 return true;
             });
         }

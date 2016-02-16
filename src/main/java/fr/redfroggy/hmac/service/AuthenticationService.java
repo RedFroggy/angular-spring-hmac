@@ -4,10 +4,10 @@ import fr.redfroggy.hmac.configuration.security.SecurityUser;
 import fr.redfroggy.hmac.dto.LoginDTO;
 import fr.redfroggy.hmac.dto.UserDTO;
 import fr.redfroggy.hmac.mock.MockUsers;
-import fr.redfroggy.hmac.utils.HmacException;
-import fr.redfroggy.hmac.utils.HmacSigner;
-import fr.redfroggy.hmac.utils.HmacToken;
-import fr.redfroggy.hmac.utils.SecurityUtils;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacSigner;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacToken;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -68,7 +68,7 @@ public class AuthenticationService {
 
         //Get Hmac signed token
         Map<String,String> customClaims = new HashMap<>();
-        customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY,SecurityUtils.HMAC_SHA_256);
+        customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
         HmacToken hmacToken = HmacSigner.getSignedToken(String.valueOf(securityUser.getId()),customClaims);
 
         for(UserDTO userDTO : MockUsers.users){
@@ -78,9 +78,9 @@ public class AuthenticationService {
         }
 
         //Set all tokens in http response headers
-        response.setHeader(SecurityUtils.X_TOKEN_ACCESS, hmacToken.getJwt());
-        response.setHeader(SecurityUtils.X_SECRET, hmacToken.getSecret());
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, SecurityUtils.HMAC_SHA_256);
+        response.setHeader(HmacUtils.X_TOKEN_ACCESS, hmacToken.getJwt());
+        response.setHeader(HmacUtils.X_SECRET, hmacToken.getSecret());
+        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, HmacUtils.HMAC_SHA_256);
 
         UserDTO userDTO = new UserDTO();
         userDTO.setId(securityUser.getId());

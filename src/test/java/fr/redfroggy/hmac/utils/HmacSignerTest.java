@@ -1,7 +1,9 @@
 package fr.redfroggy.hmac.utils;
 
-import fr.redfroggy.hmac.utils.HmacSigner;
-import fr.redfroggy.hmac.utils.HmacToken;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacSigner;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacToken;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +20,7 @@ import java.util.Map;
 public class HmacSignerTest {
 
     @Test
-    public void getSignedToken() throws HmacException{
+    public void getSignedToken() throws HmacException {
         HmacToken hmacToken = HmacSigner.getSignedToken("1",null);
         Assert.assertNotNull(hmacToken);
         Assert.assertNotNull(hmacToken.getJwt());
@@ -68,7 +70,7 @@ public class HmacSignerTest {
         Assert.assertNotNull(hmacToken);
 
         String message = "cutomMessage";
-        String encodedHmac = HmacSigner.encodeMac(hmacToken.getSecret(),message,SecurityUtils.HMAC_SHA_256);
+        String encodedHmac = HmacSigner.encodeMac(hmacToken.getSecret(),message, HmacUtils.HMAC_SHA_256);
         Assert.assertNotNull(encodedHmac);
     }
 

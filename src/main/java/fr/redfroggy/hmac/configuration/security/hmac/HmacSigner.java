@@ -1,4 +1,4 @@
-package fr.redfroggy.hmac.utils;
+package fr.redfroggy.hmac.configuration.security.hmac;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;

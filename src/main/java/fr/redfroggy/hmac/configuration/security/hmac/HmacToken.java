@@ -1,4 +1,4 @@
-package fr.redfroggy.hmac.utils;
+package fr.redfroggy.hmac.configuration.security.hmac;
 
 /**
  * HMAC Token

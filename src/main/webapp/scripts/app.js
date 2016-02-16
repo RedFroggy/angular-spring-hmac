@@ -4,7 +4,7 @@
  */
 var hmacApp = angular.module('hmacApp',['ngRoute','ngCookies','ngResource','ab-base64']);
 
-hmacApp.config(['$routeProvider','$httpProvider',function($routeProvider, $httpProvider){
+hmacApp.config(['$routeProvider','$httpProvider','hmacInterceptorProvider',function($routeProvider, $httpProvider,hmacInterceptorProvider){
     $routeProvider
         .when('/users', {
             templateUrl: 'views/users.html',
@@ -19,6 +19,10 @@ hmacApp.config(['$routeProvider','$httpProvider',function($routeProvider, $httpP
         });
 
     $httpProvider.interceptors.push('httpSecurityInterceptor');
+    $httpProvider.interceptors.push('hmacInterceptor');
+
+    //Hmac security interceptor provider configuration
+    hmacInterceptorProvider.config.rejectedApis = [{mustMatch:true,pattern:'/api'}, {mustMatch:false,pattern:'/api/authenticate'}];
 }]);
 
 hmacApp.run(function($rootScope,LoginFactory,$location){
@@ -26,6 +30,11 @@ hmacApp.run(function($rootScope,LoginFactory,$location){
     $rootScope.authenticated = false;
 
     $rootScope.isAuthorized = LoginFactory.isAuthorized;
+
+    $rootScope.$on('event:unauthorized',function(){
+        $location.path('/login');
+        LoginFactory.removeAccount();
+    });
 
     $rootScope.$on('$routeChangeStart', function () {
         if (!LoginFactory.isAuthenticated()) {
