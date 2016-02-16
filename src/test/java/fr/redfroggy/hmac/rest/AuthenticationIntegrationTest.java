@@ -57,7 +57,6 @@ public class AuthenticationIntegrationTest {
 
     @Before
     public void setup() {
-        MockUsers.mock();
         this.mockMVC = MockMvcBuilders
                 .webAppContextSetup(this.context)
                 .addFilters(springSecurityFilterChain)
@@ -104,7 +103,6 @@ public class AuthenticationIntegrationTest {
         String digest = HmacSigner.encodeMac(secret, message, HmacUtils.HMAC_SHA_256);
 
         mockMVC.perform(get("/api/logout", false)
-                .with(SecurityMockMvcRequestPostProcessors.user("admin").password("frog").roles("ADMIN"))
                 .header(HmacUtils.AUTHENTICATION, jwtToken)
                 .header(HmacUtils.X_DIGEST, digest)
                 .header(HmacUtils.X_ONCE, date)
