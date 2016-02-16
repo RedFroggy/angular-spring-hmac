@@ -64,7 +64,7 @@ public class AuthenticationServiceTest {
         Assert.assertNotNull(userDTO.getAuthorities());
         Assert.assertTrue(!userDTO.getAuthorities().isEmpty());
 
-        Mockito.verify(authenticationManager,Mockito.times(1)).authenticate(Mockito.mock(UsernamePasswordAuthenticationToken.class));
+        Mockito.verify(authenticationManager,Mockito.times(1)).authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class));
     }
 
     private SecurityUser getSecurityUser(String login, String password){
