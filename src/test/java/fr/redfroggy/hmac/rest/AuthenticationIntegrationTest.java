@@ -8,17 +8,16 @@ import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
 import fr.redfroggy.hmac.dto.LoginDTO;
 import fr.redfroggy.hmac.dto.Profile;
 import fr.redfroggy.hmac.dto.UserDTO;
-import fr.redfroggy.hmac.mock.MockUsers;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Authentication integration unit tests
  * Created by Michael DESIGAUD on 16/02/2016.
  */
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ApplicationTest.class)
 @WebAppConfiguration
