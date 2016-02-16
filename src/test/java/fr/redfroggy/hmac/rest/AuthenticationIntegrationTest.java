@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -103,6 +104,7 @@ public class AuthenticationIntegrationTest {
         String digest = HmacSigner.encodeMac(secret, message, HmacUtils.HMAC_SHA_256);
 
         mockMVC.perform(get("/api/logout", false)
+                .with(SecurityMockMvcRequestPostProcessors.user("admin").password("frog").roles("ADMIN"))
                 .header(HmacUtils.AUTHENTICATION, jwtToken)
                 .header(HmacUtils.X_DIGEST, digest)
                 .header(HmacUtils.X_ONCE, date)
