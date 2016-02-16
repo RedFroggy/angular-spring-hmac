@@ -41,20 +41,20 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 String jwtHeader = request.getHeader(HmacUtils.AUTHENTICATION);
 
                 if (jwtHeader == null || jwtHeader.isEmpty()) {
-                    throw new SecurityException("The JWT is missing from the '" + HmacUtils.AUTHENTICATION + "' header");
+                    throw new HmacException("The JWT is missing from the '" + HmacUtils.AUTHENTICATION + "' header");
                 }
 
                 String digestClient = request.getHeader(HmacUtils.X_DIGEST);
 
                 if (digestClient == null || digestClient.isEmpty()) {
-                    throw new SecurityException("The digest is missing from the '" + HmacUtils.X_DIGEST + "' header");
+                    throw new HmacException("The digest is missing from the '" + HmacUtils.X_DIGEST + "' header");
                 }
 
                 //Get X-Once header
                 String xOnceHeader = request.getHeader(HmacUtils.X_ONCE);
 
                 if (xOnceHeader == null || xOnceHeader.isEmpty()) {
-                    throw new SecurityException("The date is missing from the '" + HmacUtils.X_ONCE + "' header");
+                    throw new HmacException("The date is missing from the '" + HmacUtils.X_ONCE + "' header");
                 }
 
                 String url = request.getRequestURL().toString();
@@ -87,7 +87,7 @@ public class HmacSecurityFilter extends GenericFilterBean {
                     filterChain.doFilter(request, response);
                 } else {
                     System.out.println("Server message: " + message);
-                    throw new Exception("Digest are not matching! Client: " + digestClient + " / Server: " + digestServer);
+                    throw new HmacException("Digest are not matching! Client: " + digestClient + " / Server: " + digestServer);
                 }
             }
 

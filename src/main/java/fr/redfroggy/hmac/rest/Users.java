@@ -17,6 +17,6 @@ public class Users {
 
     @RequestMapping("/users")
     public List<UserDTO> query(){
-        return MockUsers.users;
+        return MockUsers.getUsers();
     }
 }

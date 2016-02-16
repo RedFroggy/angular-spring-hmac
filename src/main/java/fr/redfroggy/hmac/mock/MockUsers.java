@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class MockUsers {
 
-    public static List<UserDTO> users = new ArrayList<>();
+    private static List<UserDTO> users = new ArrayList<>();
 
     public static void mock(){
         UserDTO admin = new UserDTO();
@@ -40,6 +40,13 @@ public class MockUsers {
         manager.setAuthorities(Arrays.asList("ROLE_MANAGER","ROLE_USER"));
         users.add(manager);
 
+    }
+
+    public static List<UserDTO> getUsers(){
+        if(users.isEmpty()){
+            mock();
+        }
+        return users;
     }
 
     /**

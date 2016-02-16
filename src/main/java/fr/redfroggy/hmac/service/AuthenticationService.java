@@ -71,7 +71,7 @@ public class AuthenticationService {
         customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
         HmacToken hmacToken = HmacSigner.getSignedToken(String.valueOf(securityUser.getId()),customClaims);
 
-        for(UserDTO userDTO : MockUsers.users){
+        for(UserDTO userDTO : MockUsers.getUsers()){
             if(userDTO.getId().equals(securityUser.getId())){
                 userDTO.setSecretKey(hmacToken.getSecret());
             }

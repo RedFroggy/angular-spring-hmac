@@ -85,7 +85,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .inMemoryAuthentication()
                     .passwordEncoder(passwordEncoder());
 
-        for(UserDTO userDTO : MockUsers.users) {
+        for(UserDTO userDTO : MockUsers.getUsers()) {
             configurer.withUser(userDTO.getLogin())
                     .password(passwordEncoder().encode(userDTO.getPassword()))
                     .roles(userDTO.getProfile().name());
