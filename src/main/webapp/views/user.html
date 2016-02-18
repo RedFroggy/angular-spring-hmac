@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="row">
+        <form name="userForm" role="form" ng-submit="saveUser()">
+            <div class="form-group">
+                <label for="login">Login</label>
+                <input type="text" id="login" required ng-model="user.login" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="profile">Profile</label>
+                <select id="profile" ng-model="user.profile" required class="form-control" ng-options="profile for profile in profiles"></select>
+            </div>
+            <div>
+                <button type="submit" is-authorized="ROLE_MANAGER" class="btn btn-primary" ng-disabled="userForm.$invalid"><span class="fa fa-save"></span>Save</button>
+                <button type="button" class="btn btn-default" ng-click="cancel()"><span class="fa fa-save"></span>Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

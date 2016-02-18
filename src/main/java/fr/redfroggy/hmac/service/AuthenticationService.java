@@ -69,11 +69,15 @@ public class AuthenticationService {
         //Get Hmac signed token
         Map<String,String> customClaims = new HashMap<>();
         customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
-        HmacToken hmacToken = HmacSigner.getSignedToken(String.valueOf(securityUser.getId()),customClaims);
+
+        //Generate a random secret
+        String secret = HmacSigner.generateSecret();
+
+        HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(securityUser.getId()),customClaims);
 
         for(UserDTO userDTO : MockUsers.getUsers()){
             if(userDTO.getId().equals(securityUser.getId())){
-                userDTO.setSecretKey(hmacToken.getSecret());
+                userDTO.setSecretKey(secret);
             }
         }
 

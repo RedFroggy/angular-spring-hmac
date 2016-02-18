@@ -9,7 +9,7 @@
             </tr>
             <tr ng-repeat="user in users">
                 <td>{{user.id}}</td>
-                <td>{{user.login}}</td>
+                <td><a href="#/users/{{user.id}}">{{user.login}}</a></td>
                 <td>{{user.profile}}</td>
                 <td is-authorized="ROLE_ADMIN">{{user.authorities.join(',')}}</td>
             </tr>

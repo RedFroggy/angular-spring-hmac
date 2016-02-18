@@ -10,6 +10,10 @@ hmacApp.config(['$routeProvider','$httpProvider','hmacInterceptorProvider',funct
             templateUrl: 'views/users.html',
             controller: 'UsersController'
         })
+        .when('/users/:id', {
+            templateUrl: 'views/user.html',
+            controller: 'UserController'
+        })
         .when('/login', {
             templateUrl: 'views/login.html',
             controller: 'LoginController'

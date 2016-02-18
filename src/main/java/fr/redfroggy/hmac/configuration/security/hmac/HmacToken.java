@@ -6,21 +6,21 @@ package fr.redfroggy.hmac.configuration.security.hmac;
  */
 public class HmacToken {
 
-    private String token;
+    private String jwtID;
 
     private String secret;
 
     private String jwt;
 
 
-    public HmacToken(String token, String secret, String jwt) {
-        this.token = token;
+    public HmacToken(String jwtID, String secret, String jwt) {
+        this.jwtID = jwtID;
         this.secret = secret;
         this.jwt = jwt;
     }
 
-    public String getToken() {
-        return token;
+    public String getJwtID() {
+        return jwtID;
     }
 
     public String getSecret() {

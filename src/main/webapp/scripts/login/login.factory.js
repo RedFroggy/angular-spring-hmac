@@ -20,9 +20,20 @@ hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope,hmacInter
         isAuthorized:function(roles){
             if(!!$cookieStore.get('hmacApp-account')){
                 var account = JSON.parse($cookieStore.get('hmacApp-account'));
-                return account && account.authorities && account.authorities.indexOf(roles[0]) !== -1;
+                var authorized = false;
+                angular.forEach(roles,function(role){
+                    if(account && account.authorities && account.authorities.indexOf(role) !== -1){
+                        authorized = true;
+                    }
+                });
+                return authorized;
             }
             return false;
+        },
+        getAccount:function(){
+            if(!!$cookieStore.get('hmacApp-account')){
+                return JSON.parse($cookieStore.get('hmacApp-account'));
+            }
         },
         removeAccount:function(){
             $cookieStore.remove('hmacApp-account');

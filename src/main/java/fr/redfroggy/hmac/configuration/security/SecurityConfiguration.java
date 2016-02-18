@@ -61,7 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                     .antMatchers("/api/authenticate").anonymous()
                     .antMatchers("/").anonymous()
                     .antMatchers("/favicon.ico").anonymous()
-                    .anyRequest().authenticated()
+                    .antMatchers("/api/**").authenticated()
                 .and()
                 .csrf()
                     .disable()

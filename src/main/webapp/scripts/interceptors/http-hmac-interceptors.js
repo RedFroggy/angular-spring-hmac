@@ -13,7 +13,6 @@ hmacApp.provider('hmacInterceptor',function () {
         var self = this;
         return {
             request:function(request) {
-
                 var canEncode = self.config.rejectedApis && angular.isArray(self.config.rejectedApis) && self.config.rejectedApis.length > 0;
                 angular.forEach(self.config.rejectedApis,function(apiPattern) {
                     if (apiPattern.mustMatch && request.url.indexOf(apiPattern.pattern) === -1) {
@@ -26,7 +25,6 @@ hmacApp.provider('hmacInterceptor',function () {
 
                 //Process hmac encode
                 if (canEncode) {
-
                     var security = JSON.parse($cookieStore.get(self.config.securityToken));
 
                     //Get secret from session storage and decode from base64
@@ -66,6 +64,17 @@ hmacApp.provider('hmacInterceptor',function () {
                     return request;
                 }
                 return request;
+            },
+            response:function(response){
+                if(response.headers){
+                    var headers =  response.headers();
+                    console.log(headers);
+                    var security = $cookieStore.get(self.config.securityToken);
+                    if(security){
+                        security["token"] = headers["x-tokenaccess"];
+                    }
+                }
+                return response;
             },
             readHmacRequest:function(headers){
                 //Retrieve headers

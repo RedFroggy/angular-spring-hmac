@@ -1,10 +1,8 @@
 package fr.redfroggy.hmac.configuration.security.hmac;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.apache.commons.codec.binary.Base64;
@@ -34,18 +32,15 @@ public class HmacSigner {
      * @return HmacToken instance
      * @throws HmacException
      */
-    public static HmacToken getSignedToken(String iss, Map<String,String> claims) throws HmacException{
+    public static HmacToken getSignedToken(String secret, String iss, Map<String,String> claims) throws HmacException{
 
         //Generate a random token
-        String token = generateToken();
-
-        //Generate a random secret
-        String secret = generateSecret();
+        String jwtID = generateToken();
 
         //Generate a signed JWT
-        String jsonWebToken = generateJWT(secret,token, iss, claims);
+        String jsonWebToken = generateJWT(secret,jwtID, iss, claims);
 
-        return new HmacToken(token,secret, jsonWebToken);
+        return new HmacToken(jwtID,secret, jsonWebToken);
     }
 
     /**
@@ -61,7 +56,7 @@ public class HmacSigner {
      * @throws HmacException
      * @return a random secret
      */
-    private static String generateSecret() throws HmacException {
+    public static String generateSecret() throws HmacException {
         try {
             return Base64.encodeBase64String(generateToken().getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -73,14 +68,14 @@ public class HmacSigner {
     /**
      * Generate a new signed JWT
      * @param secret hmac secret
-     * @param token hmac token
+     * @param jwtID hmac jwtID
      * @param iss issuer
      * @param claims List of custom claims
      * @return Signed JWT
      */
-    private static String generateJWT(String secret, String token,String iss, Map<String,String> claims) throws HmacException{
+    private static String generateJWT(String secret, String jwtID,String iss, Map<String,String> claims) throws HmacException{
         try {
-            return signJWT(secret,token,180,iss,claims);
+            return signJWT(secret,jwtID,5,iss,claims);
         } catch (JOSEException e) {
             e.printStackTrace();
             throw new HmacException("Cannot generate JWT",e);
@@ -90,28 +85,27 @@ public class HmacSigner {
     /**
      * Sign a Json Web Token
      * @param secret Random secret in base 64
-     * @param token random token
+     * @param jwtID random jwtID
      * @param ttl time to live (in seconds)
      * @param iss issuer
      * @param claims List of custom claims
      * @return A signed json web token
      * @throws JOSEException
      */
-    public static String signJWT(String secret, String token, Integer ttl,String iss, Map<String,String> claims) throws JOSEException {
+    public static String signJWT(String secret, String jwtID, Integer ttl,String iss, Map<String,String> claims) throws JOSEException {
         JWSSigner jwsSigner = new MACSigner(secret.getBytes());
 
         //Create a new claim
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
         builder
-                .jwtID(token)
-                .expirationTime(DateTime.now().plusMinutes(ttl).toDate())
+                .jwtID(jwtID)
+                .expirationTime(DateTime.now().plusSeconds(ttl).toDate())
                 .issuer(iss);
-        if(claims != null && !claims.isEmpty()) {
 
+        if(claims != null && !claims.isEmpty()) {
             for(Map.Entry<String,String> entry : claims.entrySet()){
                 builder.claim(entry.getKey(), entry.getValue());
             }
-
         }
 
         JWTClaimsSet claimsSet = builder.build();
@@ -122,6 +116,23 @@ public class HmacSigner {
 
         //return a string jwt
         return signedJWT.serialize();
+    }
+
+    /**
+     * Verify Json Web Token
+     * @param jwt jwt
+     * @param secret shared secret
+     * @return true if the JWT is valid, false otherwise
+     * @throws HmacException
+     */
+    public static Boolean verifyJWT(final String jwt, final String secret) throws HmacException {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(jwt);
+            JWSVerifier jwsVerifier = new MACVerifier(secret);
+            return signedJWT.verify(jwsVerifier);
+        } catch (ParseException | JOSEException ex) {
+            throw new HmacException("Cannot verify JWT", ex);
+        }
     }
 
     /**
@@ -136,6 +147,7 @@ public class HmacSigner {
         try {
             //Parse jwt string
             SignedJWT signedJWT = SignedJWT.parse(jwt);
+
             Object customClaim = signedJWT.getJWTClaimsSet().getClaim(claimKey);
             return customClaim != null ? String.valueOf(customClaim) : null;
         } catch (ParseException ex) {

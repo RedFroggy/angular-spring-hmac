@@ -51,7 +51,8 @@ public class HmacSecurityFilterTest {
     @Before
     public void setUp() throws HmacException {
         hmacSecurityFilter = new HmacSecurityFilter(hmacRequester);
-        hmacToken = HmacSigner.getSignedToken(String.valueOf("1"),new HashMap<String, String>(){{put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);}});
+        String secret = HmacSigner.generateSecret();
+        hmacToken = HmacSigner.getSignedToken(secret,String.valueOf("1"),new HashMap<String, String>(){{put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);}});
         isoDate = DateTime.now().toDateTimeISO().toString();
     }
 

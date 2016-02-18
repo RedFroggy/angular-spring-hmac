@@ -1,18 +1,26 @@
 package fr.redfroggy.hmac.configuration.security.hmac;
 
+import com.nimbusds.jose.crypto.MACSigner;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.input.ClosedInputStream;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.WebUtils;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Hmac verification filter
@@ -38,9 +46,9 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 filterChain.doFilter(request, response);
             } else {
                 //Get Authentication header
-                String jwtHeader = request.getHeader(HmacUtils.AUTHENTICATION);
+                String jwt = request.getHeader(HmacUtils.AUTHENTICATION);
 
-                if (jwtHeader == null || jwtHeader.isEmpty()) {
+                if (jwt == null || jwt.isEmpty()) {
                     throw new HmacException("The JWT is missing from the '" + HmacUtils.AUTHENTICATION + "' header");
                 }
 
@@ -63,11 +71,13 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 }
 
 
-                String encoding = HmacSigner.getJwtClaim(jwtHeader, HmacSigner.ENCODING_CLAIM_PROPERTY);
-                String iss = HmacSigner.getJwtIss(jwtHeader);
+                String encoding = HmacSigner.getJwtClaim(jwt, HmacSigner.ENCODING_CLAIM_PROPERTY);
+                String iss = HmacSigner.getJwtIss(jwt);
 
                 String secret = hmacRequester.getSecret(iss);
                 Assert.notNull(secret, "Secret key cannot be null");
+
+                Assert.isTrue(HmacSigner.verifyJWT(jwt,secret),"The Json Web Token is invalid");
 
                 String message = request.getMethod().concat(url.concat(xOnceHeader));
 
@@ -76,6 +86,7 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 }
 
                 String digestServer = HmacSigner.encodeMac(secret, message, encoding);
+                System.out.println("HMAC JWT: " + jwt);
                 System.out.println("HMAC url digest: " + url);
                 System.out.println("HMAC Message server: " + message);
                 System.out.println("HMAC Secret server: " + secret);
@@ -84,6 +95,12 @@ public class HmacSecurityFilter extends GenericFilterBean {
 
                 if (digestClient.equals(digestServer)) {
                     System.out.println("Request is valid, digest are matching");
+
+                    Map<String,String> customClaims = new HashMap<>();
+                    customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
+                    HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(iss),customClaims);
+                    response.setHeader(HmacUtils.X_TOKEN_ACCESS, hmacToken.getJwt());
+
                     filterChain.doFilter(request, response);
                 } else {
                     System.out.println("Server message: " + message);

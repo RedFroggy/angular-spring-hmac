@@ -2,18 +2,24 @@ package fr.redfroggy.hmac.mock;
 
 import fr.redfroggy.hmac.dto.Profile;
 import fr.redfroggy.hmac.dto.UserDTO;
+import org.springframework.beans.BeanUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Mock users
  * Created by Michael DESIGAUD on 15/02/2016.
  */
+@SuppressWarnings("unchecked")
 public class MockUsers {
 
     private static List<UserDTO> users = new ArrayList<>();
+
+    private static Map<Profile,List<String>> authorities =  new HashMap(){{
+        put(Profile.ADMIN,Arrays.asList("ROLE_ADMIN","ROLE_MANAGER","ROLE_USER"));
+        put(Profile.USER,Arrays.asList("ROLE_USER"));
+        put(Profile.MANAGER,Arrays.asList("ROLE_MANAGER","ROLE_USER"));
+    }};
 
     public static void mock(){
         UserDTO admin = new UserDTO();
@@ -21,7 +27,7 @@ public class MockUsers {
         admin.setLogin("admin");
         admin.setProfile(Profile.ADMIN);
         admin.setPassword("frog");
-        admin.setAuthorities(Arrays.asList("ROLE_ADMIN","ROLE_MANAGER","ROLE_USER"));
+        admin.setAuthorities(authorities.get(admin.getProfile()));
         users.add(admin);
 
         UserDTO user = new UserDTO();
@@ -29,7 +35,7 @@ public class MockUsers {
         user.setLogin("user");
         user.setProfile(Profile.USER);
         user.setPassword("frog");
-        user.setAuthorities(Arrays.asList("ROLE_USER"));
+        user.setAuthorities(authorities.get(user.getProfile()));
         users.add(user);
 
         UserDTO manager = new UserDTO();
@@ -37,7 +43,7 @@ public class MockUsers {
         manager.setLogin("manager");
         manager.setProfile(Profile.MANAGER);
         manager.setPassword("frog");
-        manager.setAuthorities(Arrays.asList("ROLE_MANAGER","ROLE_USER"));
+        manager.setAuthorities(authorities.get(manager.getProfile()));
         users.add(manager);
 
     }
@@ -73,6 +79,20 @@ public class MockUsers {
             if(userDTO.getId().equals(id)){
                 return userDTO;
             }
+        }
+        return null;
+    }
+
+    /**
+     * Update a given user
+     * @param newUserDTO new user
+     * @return updated user
+     */
+    public static UserDTO update(UserDTO newUserDTO){
+        UserDTO existingUser = findById(newUserDTO.getId());
+        if(existingUser != null){
+            BeanUtils.copyProperties(newUserDTO,existingUser,"password");
+            existingUser.setAuthorities(authorities.get(existingUser.getProfile()));
         }
         return null;
     }
