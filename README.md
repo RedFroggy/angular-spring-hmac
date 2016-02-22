@@ -14,6 +14,12 @@
 - HMAC Factory for AngularJS
 - Security utility class
 
+#Credentials
+admin/frog => role ADMIN
+manager/frog => role MANAGER
+user/frog => role USER
+
+
 #Installation
 - Install bower dependencies
 ````bash
