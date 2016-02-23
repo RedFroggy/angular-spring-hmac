@@ -1,7 +1,8 @@
 import {Injectable, Component} from 'angular2/core';
 import {Http,Response,Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
-import {Account,AccountUtils} from '../account/account';
+import {Account} from '../account/account';
+import {AccountEventsService} from '../account/account.events.service';
 import {SecurityToken} from '../security/securityToken';
 import {Observable} from 'rxjs/Observable';
 import {EventEmitter} from 'angular2/core';
@@ -13,10 +14,10 @@ const HEADER_WWW_AUTHENTICATE:string = 'WWW-Authenticate';
 @Injectable()
 export class LoginService {
     http:Http;
-    accountUtils:AccountUtils;
-    constructor(http:Http,accountUtils:AccountUtils) {
+    accountEventService:AccountEventsService;
+    constructor(http:Http,accountEventService:AccountEventsService) {
         this.http = http;
-        this.accountUtils = accountUtils;
+        this.accountEventService = accountEventService;
     }
     authenticate(username:string,password:string):Observable<Account> {
 
@@ -32,9 +33,17 @@ export class LoginService {
                 localStorage.setItem('hmacApp-security',JSON.stringify(securityToken));
 
                 let account:Account = new Account(res.json());
-                account.authenticated = true;
-                this.accountUtils.loginSuccess(account);
+                this.sendLoginSuccess(account);
                 return account;
             });
+    }
+    sendLoginSuccess(account?:Account):void {
+        if(!account) {
+            account = new Account(JSON.parse(localStorage.getItem('hmacApp-account')));
+        }
+        this.accountEventService.loginSuccess(account);
+    }
+    isAuthenticated():boolean {
+        return !!localStorage.getItem('hmacApp-account');
     }
 }

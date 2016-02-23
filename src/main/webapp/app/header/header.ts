@@ -1,5 +1,5 @@
 import {Component} from 'angular2/core';
-import {AccountUtils} from '../account/account';
+import {AccountEventsService} from '../account/account.events.service';
 
 @Component({
     selector: 'header',
@@ -7,8 +7,8 @@ import {AccountUtils} from '../account/account';
 })
 export class Header {
     authenticated:boolean;
-    constructor(accountUtils:AccountUtils) {
-        accountUtils.subscribe((account) => {
+    constructor(accountEventService:AccountEventsService) {
+        accountEventService.subscribe((account) => {
             this.authenticated = account.authenticated;
         });
     }

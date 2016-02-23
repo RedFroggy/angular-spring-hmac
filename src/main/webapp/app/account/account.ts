@@ -1,6 +1,3 @@
-import {Injectable} from 'angular2/core';
-import {Subject} from 'rxjs/Subject';
-
 ///<reference path="../../../../../typings/lodash/lodash.d.ts" />
 
 export class Account {
@@ -14,14 +11,3 @@ export class Account {
         this.authenticated = false;
     }
 }
-
-@Injectable()
-export class AccountUtils extends Subject<Account> {
-    constructor() {
-        super();
-    }
-    loginSuccess(account:Account) {
-        super.next(account);
-    }
-}
-
