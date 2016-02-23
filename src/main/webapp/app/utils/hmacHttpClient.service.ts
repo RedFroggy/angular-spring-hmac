@@ -38,6 +38,19 @@ export class HmacHttpClient extends Http {
             options.headers = new Headers();
         }
         this.addSecurityHeader(url,'GET',options);
-        return super.get(url,options);
+        let observer:Observable<Response> = super.get(url,options);
+        observer.subscribe((res:Response) => {
+            if(res.ok && res.headers) {
+                console.log(res.headers);
+                let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
+                if(securityToken) {
+                    securityToken.token = res.headers.get(AppUtils.HEADER_X_TOKEN_ACCESS);
+                    console.log(securityToken);
+                    localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
+                }
+            }
+        });
+
+        return observer;
     }
 }

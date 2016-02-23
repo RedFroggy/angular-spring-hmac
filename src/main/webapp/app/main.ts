@@ -16,6 +16,7 @@ bootstrap(AppComponent, [
     provide(Http, {useFactory:(xhrBackend: XHRBackend, requestOptions: RequestOptions) => {
             return new HmacHttpClient(xhrBackend, requestOptions);
         },
-        deps: [XHRBackend, RequestOptions]
+        deps: [XHRBackend, RequestOptions],
+        multi:false
     })
 ]);
