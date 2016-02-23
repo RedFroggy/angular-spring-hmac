@@ -1,6 +1,6 @@
 import {Component} from 'angular2/core';
 import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
-import {FormBuilder, Validators} from 'angular2/common';
+import {FormBuilder, Validators, ControlGroup} from 'angular2/common';
 import {LoginService} from './login.service';
 import {Account} from '../account/account';
 
@@ -15,7 +15,7 @@ export class Login {
     password:string;
     router:Router;
     wrongCredentials:boolean;
-    loginForm;
+    loginForm:ControlGroup;
     loginService:LoginService;
     account:Account;
     constructor(router: Router,form: FormBuilder,loginService:LoginService) {

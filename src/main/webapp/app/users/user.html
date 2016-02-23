@@ -1,0 +1,20 @@
+<div class="container">
+    <div class="row">
+        <form [ngFormModel]="userForm" (submit)="saveUser()">
+            <div class="form-group">
+                <label for="login">Login</label>
+                <input type="text" id="login" required [ngModel]="user.login" ngControl="login" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="profile">Profile</label>
+                <select id="profile" [ngModel]="user.profile" ngControl="profile" required class="form-control">
+                    <option *ngFor="#profile of profiles" [value]="profile">{{profile}}</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" is-authorized="ROLE_MANAGER" class="btn btn-primary" [disabled]="userForm.$invalid"><span class="fa fa-save"></span>Save</button>
+                <button type="button" class="btn btn-default" (click)="cancel()"><span class="fa fa-save"></span>Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

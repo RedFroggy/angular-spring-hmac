@@ -2,6 +2,7 @@ import {Component} from 'angular2/core';
 import {ROUTER_DIRECTIVES, RouteConfig, Route, Router} from 'angular2/router';
 import {Login} from './login/login';
 import {Users} from './users/users';
+import {User} from './users/user';
 import {Header} from './header/header';
 import {LoginService} from './login/login.service';
 
@@ -13,7 +14,8 @@ import {LoginService} from './login/login.service';
 })
 @RouteConfig([
     new Route({path: '/authenticate', component: Login, name: 'Login',useAsDefault: true}),
-    new Route({path: '/users', component: Users, name: 'Users'})
+    new Route({path: '/users', component: Users, name: 'Users'}),
+    new Route({path: '/user/:id', component: User, name: 'User'})
 ])
 export class AppComponent {
     constructor(router:Router,loginService:LoginService) {
