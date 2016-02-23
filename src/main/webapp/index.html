@@ -1,37 +1,26 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <script>document.write('<base href="' + document.location + '" />');</script>
     <title>HMAC Security example </title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="assets/styles/style.css">
     <link rel="icon" href="favicon.ico">
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/angular2/bundles/angular2-polyfills.min.js"></script>
+    <script src="node_modules/es6-shim/es6-shim.min.js"></script>
+    <script src="node_modules/systemjs/dist/system.js"></script>
+    <script src="node_modules/rxjs/bundles/Rx.min.js"></script>
+    <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
+    <script src="node_modules/angular2/bundles/http.dev.js"></script>
+    <script src="node_modules/angular2/bundles/router.dev.js"></script>
+    <script src="node_modules/typescript/lib/typescript.js"></script>
+    <script src="node_modules/lodash/lodash.js"></script>
+    <script src="init.js"></script>
 </head>
-<body ng-app="hmacApp">
-    <div class="container">
-        <div ng-include="'views/header.html'" ng-if="authenticated"></div>
-        <div ng-view=""></div>
-    </div>
-    <script src="bower_components/underscore/underscore.js"></script>
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/cryptoJS/crypto-js.js"></script>
-    <script src="bower_components/cryptoJS/hmac-sha256.js"></script>
-    <script src="bower_components/cryptoJS/hmac-sha1.js"></script>
-    <script src="bower_components/cryptoJS/hmac-md5.js"></script>
-    <script src="bower_components/angular-utf8-base64/angular-utf8-base64.js"></script>
-    <script src="scripts/app.js"></script>
-    <script src="scripts/login/login.controller.js"></script>
-    <script src="scripts/login/login.factory.js"></script>
-    <script src="scripts/users/users.controller.js"></script>
-    <script src="scripts/interceptors/http-interceptors.js"></script>
-    <script src="scripts/header/header.controller.js"></script>
-    <script src="scripts/directives/is-authorized.directive.js"></script>
-    <script src="scripts/interceptors/http-hmac-interceptors.js"></script>
+<body>
+    <hmac-app></hmac-app>
 </body>
 </html>

@@ -48,10 +48,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
                 .antMatchers("/scripts/**/*.{js}")
-                .antMatchers("/bower_components/**")
+                .antMatchers("/node_modules/**")
                 .antMatchers("/assets/**")
                 .antMatchers("*.{ico}")
-                .antMatchers("/views/**/*.{html}");
+                .antMatchers("/views/**/*.{html}")
+                .antMatchers("/app/**/*.{html}");
     }
 
     @Override
