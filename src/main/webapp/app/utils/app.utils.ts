@@ -1,0 +1,14 @@
+//Headers HTTP
+export const HEADER_X_SECRET:string = 'X-Secret';
+export const HEADER_X_TOKEN_ACCESS:string = 'X-TokenAccess';
+export const HEADER_X_DIGEST:string = 'X-Digest';
+export const HEADER_X_ONCE:string = 'X-Once';
+export const HEADER_WWW_AUTHENTICATE:string = 'WWW-Authenticate';
+export const HEADER_AUTHENTICATION:string = 'Authentication';
+
+//Local storage keys
+export const STORAGE_ACCOUNT_TOKEN:string = 'hmacApp-account';
+export const STORAGE_SECURITY_TOKEN:string = 'hmacApp-security';
+
+//Common http root api
+export const BACKEND_API_ROOT_URL:string = 'http://localhost:8080/api';

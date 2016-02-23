@@ -1,15 +1,12 @@
 import {Injectable, Component} from 'angular2/core';
-import {Http,Response,Headers} from 'angular2/http';
+import {Response,Headers,Http} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import {Account} from '../account/account';
 import {AccountEventsService} from '../account/account.events.service';
 import {SecurityToken} from '../security/securityToken';
 import {Observable} from 'rxjs/Observable';
 import {EventEmitter} from 'angular2/core';
-
-const HEADER_X_SECRET:string = 'X-Secret';
-const HEADER_X_TOKEN_ACCESS:string = 'X-TokenAccess';
-const HEADER_WWW_AUTHENTICATE:string = 'WWW-Authenticate';
+import * as AppUtils from '../utils/app.utils';
 
 @Injectable()
 export class LoginService {
@@ -24,13 +21,18 @@ export class LoginService {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        return this.http.post('http://localhost:8080/api/authenticate', JSON.stringify({login:username,password:password}),{headers:headers})
+        return this.http.post(AppUtils.BACKEND_API_ROOT_URL+'/authenticate', JSON.stringify({login:username,password:password}),{headers:headers})
             .map((res:Response) => {
-                let securityToken:SecurityToken = new SecurityToken(res.headers.get(HEADER_X_SECRET),res.headers.get(HEADER_X_TOKEN_ACCESS),
-                    res.headers.get(HEADER_WWW_AUTHENTICATE));
+                let securityToken:SecurityToken = new SecurityToken(
+                    {
+                    secretKey:res.headers.get(AppUtils.HEADER_X_SECRET),
+                    token:res.headers.get(AppUtils.HEADER_X_TOKEN_ACCESS),
+                    securityLevel:res.headers.get(AppUtils.HEADER_WWW_AUTHENTICATE)
+                    }
+                );
 
-                localStorage.setItem('hmacApp-account',res.text());
-                localStorage.setItem('hmacApp-security',JSON.stringify(securityToken));
+                localStorage.setItem(AppUtils.STORAGE_ACCOUNT_TOKEN,res.text());
+                localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
 
                 let account:Account = new Account(res.json());
                 this.sendLoginSuccess(account);
@@ -39,11 +41,24 @@ export class LoginService {
     }
     sendLoginSuccess(account?:Account):void {
         if(!account) {
-            account = new Account(JSON.parse(localStorage.getItem('hmacApp-account')));
+            account = new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN)));
         }
         this.accountEventService.loginSuccess(account);
     }
     isAuthenticated():boolean {
-        return !!localStorage.getItem('hmacApp-account');
+        return !!localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
+    }
+    removeAccount():void {
+        this.accountEventService.logout(new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN))));
+        localStorage.removeItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
+        localStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
+    }
+    logout():Observable<Response> {
+        let observer:Observable<Response> = this.http.get(AppUtils.BACKEND_API_ROOT_URL+'/logout');
+        observer.subscribe(() => {
+            console.log('removing account');
+            this.removeAccount();
+        });
+        return observer;
     }
 }
