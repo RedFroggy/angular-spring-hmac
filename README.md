@@ -4,7 +4,7 @@
 - Spring Boot
 - Spring Security
 - Spring MVC
-- AngularJS
+- AngularJS v2
 
 #Features
 - Token based authentication
@@ -21,9 +21,10 @@ user/frog => role USER
 
 
 #Installation
-- Install bower dependencies
+- Go to src/main/webapp folder
+- Install npm dependencies
 ````bash
-$ bower install
+$ npm install
 ````
 
 #To run Java unit tests
