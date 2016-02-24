@@ -6,10 +6,9 @@ import {IsAuthorized} from '../utils/is-authorized.directive';
 
 @Component({
     selector: 'users',
-    directives:[ROUTER_DIRECTIVES],
+    directives:[IsAuthorized],
     templateUrl: './app/users/users.html',
-    providers:[UsersService],
-    directives: [IsAuthorized]
+    providers:[UsersService]
 })
 export class Users {
     users:Array<Account>;
