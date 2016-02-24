@@ -11,19 +11,14 @@ import {Router} from 'angular2/router';
 export class Header {
     authenticated:boolean;
     loginService:LoginService;
-    router:Router;
-    constructor(accountEventService:AccountEventsService,loginService:LoginService,router: Router) {
+    constructor(accountEventService:AccountEventsService,loginService:LoginService) {
         this.loginService = loginService;
-        this.router = router;
         accountEventService.subscribe((account) => {
             this.authenticated = account.authenticated;
         });
     }
     logout(event:Event):void {
         event.preventDefault();
-        this.loginService.logout().subscribe(() => {
-            console.log('redirect to login page');
-            this.router.navigate(['Login']);
-        });
+        this.loginService.logout();
     }
 }

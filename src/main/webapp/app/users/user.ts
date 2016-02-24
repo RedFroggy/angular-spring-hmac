@@ -37,7 +37,7 @@ export class User {
         this.userService.getProfiles().subscribe((profiles:Array<string>) => this.profiles = profiles);
     }
     saveUser():void {
-
+        this.userService.saveUser(this.user).subscribe(() => this.router.navigate(['Users']));
     }
     cancel():void {
         this.router.navigate(['Users']);

@@ -94,6 +94,6 @@ public class MockUsers {
             BeanUtils.copyProperties(newUserDTO,existingUser,"password");
             existingUser.setAuthorities(authorities.get(existingUser.getProfile()));
         }
-        return null;
+        return existingUser;
     }
 }

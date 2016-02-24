@@ -8,11 +8,15 @@ export class AccountEventsService extends Subject<Account> {
         super();
     }
     loginSuccess(account:Account) {
-        account.authenticated = true;
-        super.next(account);
+        if(account) {
+            account.authenticated = true;
+            super.next(account);
+        }
     }
     logout(account:Account) {
-        account.authenticated = false;
-        super.next(account);
+        if(account) {
+            account.authenticated = false;
+            super.next(account);
+        }
     }
 }

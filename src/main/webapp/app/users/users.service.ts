@@ -1,5 +1,5 @@
 import {Injectable} from 'angular2/core';
-import {Http,Response} from 'angular2/http';
+import {Http,Response,Headers} from 'angular2/http';
 import * as AppUtils from '../utils/app.utils';
 import {Observable} from 'rxjs/Observable';
 import {Account} from '../account/account';
@@ -28,5 +28,13 @@ export class UsersService {
     }
     getProfiles():Observable<Array<string>> {
         return this.http.get(AppUtils.BACKEND_API_ROOT_URL+'/users/profiles').map((res:Response) => res.json());
+    }
+    saveUser(account:Account):Observable<Account> {
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        return this.http.put(AppUtils.BACKEND_API_ROOT_URL+'/users/'+account.id, JSON.stringify(account),{headers:headers})
+            .map((res:Response) => {
+                return new Account(res.json());
+            });
     }
 }

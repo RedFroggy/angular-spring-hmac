@@ -7,13 +7,16 @@ import {SecurityToken} from '../security/securityToken';
 import {Observable} from 'rxjs/Observable';
 import {EventEmitter} from 'angular2/core';
 import * as AppUtils from '../utils/app.utils';
+import {Router} from 'angular2/router';
 
 @Injectable()
 export class LoginService {
     http:Http;
     accountEventService:AccountEventsService;
-    constructor(http:Http,accountEventService:AccountEventsService) {
+    router:Router;
+    constructor(http:Http,accountEventService:AccountEventsService,router: Router) {
         this.http = http;
+        this.router = router;
         this.accountEventService = accountEventService;
     }
     authenticate(username:string,password:string):Observable<Account> {
@@ -53,12 +56,12 @@ export class LoginService {
         localStorage.removeItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
         localStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
     }
-    logout():Observable<Response> {
-        let observer:Observable<Response> = this.http.get(AppUtils.BACKEND_API_ROOT_URL+'/logout');
-        observer.subscribe(() => {
+    logout():void {
+        console.log('Logging out');
+        this.http.get(AppUtils.BACKEND_API_ROOT_URL+'/logout').subscribe(() => {
             console.log('removing account');
             this.removeAccount();
+            this.router.navigate(['Login']);
         });
-        return observer;
     }
 }
