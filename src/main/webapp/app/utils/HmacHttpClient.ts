@@ -19,8 +19,7 @@ export class HmacHttpClient extends Http {
     }
     addSecurityHeader(url:string,method:string,options: RequestOptionsArgs):void {
 
-        //TODO externalize
-        if(url.indexOf('/api') !== -1 && url.indexOf('/api/authenticate') === -1) {
+        if(AppUtils.UrlMatcher.matches(url)) {
 
             let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
             let date:string = new Date().toISOString();

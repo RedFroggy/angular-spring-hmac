@@ -4,7 +4,7 @@ import {ROUTER_PROVIDERS, APP_BASE_HREF, LocationStrategy,HashLocationStrategy }
 import {AppComponent} from './app.component';
 import {HTTP_PROVIDERS, Http,RequestOptions, XHRBackend} from 'angular2/http';
 import {AccountEventsService} from './account/account.events.service';
-import {HmacHttpClient} from './utils/hmacHttpClient.service';
+import {HmacHttpClient} from './utils/HmacHttpClient.ts';
 import {MockBackend} from 'angular2/http/testing';
 import {LoginService} from './login/login.service';
 
@@ -16,8 +16,8 @@ bootstrap(AppComponent, [
     Http,
     LoginService,
     provide(LocationStrategy, {useClass: HashLocationStrategy}),
-    provide(Http, {useFactory:(xhrBackend: XHRBackend, requestOptions: RequestOptions,accountEventService:AccountEventsService) => {
-            return new HmacHttpClient(xhrBackend, requestOptions,accountEventService);
+    provide(Http, {useFactory:(xhrBackend: XHRBackend, requestOptions: RequestOptions,loginService:LoginService) => {
+            return new HmacHttpClient(xhrBackend, requestOptions,loginService);
         },
         deps: [XHRBackend, RequestOptions, AccountEventsService],
         multi:false

@@ -24,7 +24,7 @@ export class LoginService {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        return this.http.post(AppUtils.BACKEND_API_ROOT_URL+'/authenticate', JSON.stringify({login:username,password:password}),{headers:headers})
+        return this.http.post(AppUtils.BACKEND_API_ROOT_URL+AppUtils.BACKEND_API_AUTHENTICATE_PATH, JSON.stringify({login:username,password:password}),{headers:headers})
             .map((res:Response) => {
                 let securityToken:SecurityToken = new SecurityToken(
                     {
