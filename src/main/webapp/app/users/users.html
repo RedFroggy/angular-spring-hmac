@@ -5,13 +5,13 @@
                 <th>#</th>
                 <th>Login</th>
                 <th>Profile</th>
-                <th is-authorized="ROLE_ADMIN">Authorities</th>
+                <th [isAuthorized]="'ROLE_ADMIN'">Authorities</th>
             </tr>
             <tr *ngFor='#user of users'>
                 <td>{{user.id}}</td>
                 <td><a href="" (click)="onSelectUser($event,user.id)">{{user.login}}</a></td>
                 <td>{{user.profile}}</td>
-                <td is-authorized="ROLE_ADMIN">{{user.authorities.join(',')}}</td>
+                <td [isAuthorized]="'ROLE_ADMIN'">{{user.authorities.join(',')}}</td>
             </tr>
         </table>
     </div>

@@ -64,4 +64,19 @@ export class LoginService {
             this.router.navigate(['Login']);
         });
     }
+    isAuthorized(roles:Array<string>):boolean {
+        let authorized:boolean = false;
+        if(this.isAuthenticated() && roles) {
+            let account:Account = new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN)));
+            if(account && account.authorities) {
+
+                roles.forEach((role:string) => {
+                    if(account.authorities.indexOf(role) !== -1) {
+                        authorized = true;
+                    }
+                });
+            }
+        }
+        return authorized;
+    }
 }
