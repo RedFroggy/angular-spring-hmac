@@ -2,5 +2,5 @@ src/main/webapp/node_modules/
 target/
 .idea/
 *.iml
-src/main/webapp/**/*.js
+/src/main/webapp/app/**/*.js
 src/main/webapp/**/*.js.map
