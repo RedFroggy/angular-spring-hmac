@@ -52,17 +52,22 @@ export class LoginService {
         return !!localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
     }
     removeAccount():void {
-        this.accountEventService.logout(new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN))));
         localStorage.removeItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
         localStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
     }
-    logout():void {
+    logout(callServer:boolean = true):void {
         console.log('Logging out');
-        this.http.get(AppUtils.BACKEND_API_ROOT_URL+'/logout').subscribe(() => {
-            console.log('removing account');
+
+        if(callServer) {
+            this.http.get(AppUtils.BACKEND_API_ROOT_URL + '/logout').subscribe(() => {
+                this.accountEventService.logout(new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN))));
+                this.removeAccount();
+                this.router.navigate(['Login']);
+            });
+        } else {
             this.removeAccount();
             this.router.navigate(['Login']);
-        });
+        }
     }
     isAuthorized(roles:Array<string>):boolean {
         let authorized:boolean = false;

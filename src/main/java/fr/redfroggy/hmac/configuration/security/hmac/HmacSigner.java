@@ -3,7 +3,9 @@ package fr.redfroggy.hmac.configuration.security.hmac;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
@@ -116,6 +118,21 @@ public class HmacSigner {
 
         //return a string jwt
         return signedJWT.serialize();
+    }
+
+    /**
+     * Check JWT is expired
+     * @param jwtString JWT string representation
+     * @return true if expired, false otherwise
+     * @throws ParseException
+     */
+    public static Boolean isJwtExpired(String jwtString) throws ParseException {
+        JWT jwt = JWTParser.parse(jwtString);
+        if(jwt.getJWTClaimsSet() != null && jwt.getJWTClaimsSet().getExpirationTime() != null) {
+            DateTime expirationDate = new DateTime(jwt.getJWTClaimsSet().getExpirationTime());
+            return expirationDate.isBefore(DateTime.now());
+        }
+        return false;
     }
 
     /**

@@ -14,7 +14,12 @@ export class Header {
     constructor(accountEventService:AccountEventsService,loginService:LoginService) {
         this.loginService = loginService;
         accountEventService.subscribe((account) => {
-            this.authenticated = account.authenticated;
+            if(!account.authenticated) {
+                this.authenticated = false;
+                this.loginService.logout(false);
+            } else {
+                this.authenticated = true;
+            }
         });
     }
     logout(event:Event):void {

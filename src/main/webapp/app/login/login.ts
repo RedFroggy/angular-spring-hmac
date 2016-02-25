@@ -3,6 +3,9 @@ import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
 import {FormBuilder, Validators, ControlGroup} from 'angular2/common';
 import {LoginService} from './login.service';
 import {Account} from '../account/account';
+import {AccountEventsService} from '../account/account.events.service';
+
+///<reference path="../../../../../typings/lodash/lodash.d.ts" />
 
 @Component({
     selector: 'login',
@@ -18,13 +21,26 @@ export class Login {
     loginForm:ControlGroup;
     loginService:LoginService;
     account:Account;
-    constructor(router: Router,form: FormBuilder,loginService:LoginService) {
+    error:string;
+    constructor(router: Router,form: FormBuilder,loginService:LoginService,accountEventService:AccountEventsService) {
         this.router = router;
         this.wrongCredentials = false;
         this.loginService = loginService;
         this.loginForm = form.group({
             username: ['', Validators.required],
             password: ['', Validators.required]
+        });
+
+        accountEventService.subscribe((account) => {
+            if(!account.authenticated) {
+                if(account.error) {
+                    if(account.error.indexOf('BadCredentialsException') !== -1) {
+                        this.error = 'Username and/or password are invalid !';
+                    } else {
+                        this.error = account.error;
+                    }
+                }
+            }
         });
     }
     authenticate(event, username, password) {

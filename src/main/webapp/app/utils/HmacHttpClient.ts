@@ -1,21 +1,23 @@
 import {Injectable,Injector} from 'angular2/core';
-import {Http,Response,RequestOptionsArgs, Headers, RequestOptions, ConnectionBackend} from 'angular2/http';
+import {Http,Response,RequestOptionsArgs, Headers, Request, RequestOptions, ConnectionBackend} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 import {SecurityToken} from '../security/securityToken';
 import * as AppUtils from '../utils/app.utils';
-import {LoginService} from '../login/login.service';
 import {AccountEventsService} from '../account/account.events.service';
-
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/share';
+import {Observer} from 'rxjs/Observer';
 
 ///<reference path="../../../../../typings/cryptojs/cryptojs.d.ts" />
 
 @Injectable()
 export class HmacHttpClient extends Http {
     http:Http;
-    loginService:LoginService;
-    constructor(_backend: ConnectionBackend, _defaultOptions: RequestOptions,loginService:LoginService) {
+    accountEventsService:AccountEventsService;
+    constructor(_backend: ConnectionBackend, _defaultOptions: RequestOptions,accountEventsService:AccountEventsService) {
         super(_backend,_defaultOptions);
-        this.loginService = loginService;
+        this.accountEventsService = accountEventsService;
     }
     addSecurityHeader(url:string,method:string,options: RequestOptionsArgs):void {
 
@@ -48,44 +50,61 @@ export class HmacHttpClient extends Http {
         }
         return options;
     }
-    observeResponse(observer:Observable<Response>):void {
-        observer.subscribe((res:Response) => {
-            if(res.ok && res.headers) {
-                let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
-                if(securityToken) {
-                    securityToken.token = res.headers.get(AppUtils.HEADER_X_TOKEN_ACCESS);
-                    localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
-                }
+    mapResponse(res:Response,observer:Observer<Response>):void {
+        if(res.ok && res.headers) {
+            let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
+            if(securityToken) {
+                securityToken.token = res.headers.get(AppUtils.HEADER_X_TOKEN_ACCESS);
+                localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
             }
-        },(res:Response)=> {
-            if(res.status === 403) {
-                console.log('Unauthorized request: redirected to the login page');
-                this.loginService.logout();
-            }
-        });
+        }
+        observer.next(res);
+        observer.complete();
+    }
+    catchResponse(res:Response,observer:Observer<Response>):void {
+        if(res.status === 403) {
+            console.log('Unauthorized request:',res.text());
+            this.accountEventsService.logout({error:res.text()});
+        }
+        observer.complete();
     }
     get(url: string, options?: RequestOptionsArgs): Observable<Response> {
         options = this.setOptions(options);
         this.addSecurityHeader(url,'GET',options);
 
-        let observer:Observable<Response> = super.get(url,options);
-        this.observeResponse(observer);
-        return observer;
+        return Observable.create((observer:Observer<Response>) => {
+            super.get(url, options)
+                .subscribe((res:Response) => {
+                    this.mapResponse(res,observer);
+                },(res:Response) => {
+                    this.catchResponse(res,observer);
+                });
+        });
     }
     post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
         options = this.setOptions(options);
         this.addSecurityHeader(url,'POST',options);
 
-        let observer:Observable<Response> = super.post(url,body,options);
-        this.observeResponse(observer);
-        return observer;
+        return Observable.create((observer:Observer<Response>) => {
+            super.post(url,body,options)
+                .subscribe((res:Response) => {
+                    this.mapResponse(res,observer);
+                },(res:Response) => {
+                    this.catchResponse(res,observer);
+                });
+        });
     }
     put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
         options = this.setOptions(options);
         this.addSecurityHeader(url,'PUT',options);
 
-        let observer:Observable<Response> = super.put(url,body,options);
-        this.observeResponse(observer);
-        return observer;
+        return Observable.create((observer:Observer<Response>) => {
+            super.put(url,body,options)
+                .subscribe((res:Response) => {
+                    this.mapResponse(res,observer);
+                },(res:Response) => {
+                    this.catchResponse(res,observer);
+                });
+        });
     }
 }

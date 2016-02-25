@@ -79,6 +79,8 @@ public class HmacSecurityFilter extends GenericFilterBean {
 
                 Assert.isTrue(HmacSigner.verifyJWT(jwt,secret),"The Json Web Token is invalid");
 
+                Assert.isTrue(!HmacSigner.isJwtExpired(jwt),"The Json Web Token is expired");
+
                 String message = request.getMethod().concat(url.concat(xOnceHeader));
 
                 if (hmacRequester.isSecretInBase64()) {
