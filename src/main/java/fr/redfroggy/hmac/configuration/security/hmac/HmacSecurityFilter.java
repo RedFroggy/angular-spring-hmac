@@ -1,23 +1,17 @@
 package fr.redfroggy.hmac.configuration.security.hmac;
 
-import com.nimbusds.jose.crypto.MACSigner;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.io.input.ClosedInputStream;
-import org.springframework.http.HttpMethod;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.WebUtils;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +21,8 @@ import java.util.Map;
  * Created by Michael DESIGAUD on 16/02/2016.
  */
 public class HmacSecurityFilter extends GenericFilterBean {
+
+    public static final Integer JWT_TTL = 20;
 
     private HmacRequester hmacRequester;
 
@@ -79,6 +75,8 @@ public class HmacSecurityFilter extends GenericFilterBean {
 
                 Assert.isTrue(HmacSigner.verifyJWT(jwt,secret),"The Json Web Token is invalid");
 
+                Assert.isTrue(!HmacSigner.isJwtExpired(jwt),"The Json Web Token is expired");
+
                 String message = request.getMethod().concat(url.concat(xOnceHeader));
 
                 if (hmacRequester.isSecretInBase64()) {
@@ -98,7 +96,7 @@ public class HmacSecurityFilter extends GenericFilterBean {
 
                     Map<String,String> customClaims = new HashMap<>();
                     customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
-                    HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(iss),customClaims);
+                    HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(iss),JWT_TTL,customClaims);
                     response.setHeader(HmacUtils.X_TOKEN_ACCESS, hmacToken.getJwt());
 
                     filterChain.doFilter(request, response);

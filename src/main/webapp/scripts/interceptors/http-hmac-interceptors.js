@@ -68,7 +68,6 @@ hmacApp.provider('hmacInterceptor',function () {
             response:function(response){
                 if(response.headers){
                     var headers =  response.headers();
-                    console.log(headers);
                     var security = $cookieStore.get(self.config.securityToken);
                     if(security){
                         security["token"] = headers["x-tokenaccess"];

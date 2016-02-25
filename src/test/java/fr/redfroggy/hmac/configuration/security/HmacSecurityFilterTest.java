@@ -52,7 +52,7 @@ public class HmacSecurityFilterTest {
     public void setUp() throws HmacException {
         hmacSecurityFilter = new HmacSecurityFilter(hmacRequester);
         String secret = HmacSigner.generateSecret();
-        hmacToken = HmacSigner.getSignedToken(secret,String.valueOf("1"),new HashMap<String, String>(){{put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);}});
+        hmacToken = HmacSigner.getSignedToken(secret,String.valueOf("1"),20,new HashMap<String, String>(){{put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);}});
         isoDate = DateTime.now().toDateTimeISO().toString();
     }
 

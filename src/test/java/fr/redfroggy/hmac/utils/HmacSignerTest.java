@@ -21,7 +21,7 @@ public class HmacSignerTest {
 
     @Test
     public void getSignedToken() throws HmacException {
-        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",null);
+        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",20,null);
         Assert.assertNotNull(hmacToken);
         Assert.assertNotNull(hmacToken.getJwt());
         Assert.assertNotNull(hmacToken.getSecret());
@@ -36,7 +36,7 @@ public class HmacSignerTest {
                 put("otherProperty","otherClaimValue");
             }
         };
-        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",claims);
+        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",20,claims);
         Assert.assertNotNull(hmacToken);
         Assert.assertNotNull(hmacToken.getJwt());
         Assert.assertNotNull(hmacToken.getSecret());
@@ -53,7 +53,7 @@ public class HmacSignerTest {
     @Test
     public void getJwtIss() throws HmacException{
         String userId = "1";
-        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),userId,null);
+        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),userId,20,null);
         Assert.assertNotNull(hmacToken);
         Assert.assertNotNull(hmacToken.getJwt());
         Assert.assertNotNull(hmacToken.getSecret());
@@ -66,7 +66,7 @@ public class HmacSignerTest {
 
     @Test
     public void encodeMac() throws HmacException{
-        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",null);
+        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",20,null);
         Assert.assertNotNull(hmacToken);
 
         String message = "cutomMessage";
@@ -76,7 +76,7 @@ public class HmacSignerTest {
 
     @Test(expected = HmacException.class)
     public void encodeMacWithWrongAlgorithm() throws HmacException{
-        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",null);
+        HmacToken hmacToken = HmacSigner.getSignedToken(HmacSigner.generateSecret(),"1",20,null);
         Assert.assertNotNull(hmacToken);
 
         String message = "customMessage";

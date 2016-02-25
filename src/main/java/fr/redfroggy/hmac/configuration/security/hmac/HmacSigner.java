@@ -3,7 +3,9 @@ package fr.redfroggy.hmac.configuration.security.hmac;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
@@ -28,17 +30,18 @@ public class HmacSigner {
      * The issuer (user id) and the custom properties are stored in the JWT
      * to be retrieve later
      * @param iss issuer (user identifier)
+     * @param ttl time to live (in seconds)
      * @param claims Custom properties to store in the JWT
      * @return HmacToken instance
      * @throws HmacException
      */
-    public static HmacToken getSignedToken(String secret, String iss, Map<String,String> claims) throws HmacException{
+    public static HmacToken getSignedToken(String secret, String iss, Integer ttl, Map<String,String> claims) throws HmacException{
 
         //Generate a random token
         String jwtID = generateToken();
 
         //Generate a signed JWT
-        String jsonWebToken = generateJWT(secret,jwtID, iss, claims);
+        String jsonWebToken = generateJWT(secret,jwtID, iss, ttl, claims);
 
         return new HmacToken(jwtID,secret, jsonWebToken);
     }
@@ -70,12 +73,13 @@ public class HmacSigner {
      * @param secret hmac secret
      * @param jwtID hmac jwtID
      * @param iss issuer
+     * @param ttl time to live (in seconds)
      * @param claims List of custom claims
      * @return Signed JWT
      */
-    private static String generateJWT(String secret, String jwtID,String iss, Map<String,String> claims) throws HmacException{
+    private static String generateJWT(String secret, String jwtID,String iss, Integer ttl, Map<String,String> claims) throws HmacException{
         try {
-            return signJWT(secret,jwtID,5,iss,claims);
+            return signJWT(secret,jwtID,ttl,iss,claims);
         } catch (JOSEException e) {
             e.printStackTrace();
             throw new HmacException("Cannot generate JWT",e);
@@ -99,7 +103,7 @@ public class HmacSigner {
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
         builder
                 .jwtID(jwtID)
-                .expirationTime(DateTime.now().plusSeconds(ttl).toDate())
+                .expirationTime(DateTime.now().plusMinutes(ttl).toDate())
                 .issuer(iss);
 
         if(claims != null && !claims.isEmpty()) {
@@ -116,6 +120,21 @@ public class HmacSigner {
 
         //return a string jwt
         return signedJWT.serialize();
+    }
+
+    /**
+     * Check JWT is expired
+     * @param jwtString JWT string representation
+     * @return true if expired, false otherwise
+     * @throws ParseException
+     */
+    public static Boolean isJwtExpired(String jwtString) throws ParseException {
+        JWT jwt = JWTParser.parse(jwtString);
+        if(jwt.getJWTClaimsSet() != null && jwt.getJWTClaimsSet().getExpirationTime() != null) {
+            DateTime expirationDate = new DateTime(jwt.getJWTClaimsSet().getExpirationTime());
+            return expirationDate.isBefore(DateTime.now());
+        }
+        return false;
     }
 
     /**
