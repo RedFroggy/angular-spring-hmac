@@ -1,13 +1,10 @@
 package fr.redfroggy.hmac.service;
 
 import fr.redfroggy.hmac.configuration.security.SecurityUser;
+import fr.redfroggy.hmac.configuration.security.hmac.*;
 import fr.redfroggy.hmac.dto.LoginDTO;
 import fr.redfroggy.hmac.dto.UserDTO;
 import fr.redfroggy.hmac.mock.MockUsers;
-import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
-import fr.redfroggy.hmac.configuration.security.hmac.HmacSigner;
-import fr.redfroggy.hmac.configuration.security.hmac.HmacToken;
-import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -73,7 +70,7 @@ public class AuthenticationService {
         //Generate a random secret
         String secret = HmacSigner.generateSecret();
 
-        HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(securityUser.getId()),customClaims);
+        HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(securityUser.getId()), HmacSecurityFilter.JWT_TTL,customClaims);
 
         for(UserDTO userDTO : MockUsers.getUsers()){
             if(userDTO.getId().equals(securityUser.getId())){

@@ -30,17 +30,18 @@ public class HmacSigner {
      * The issuer (user id) and the custom properties are stored in the JWT
      * to be retrieve later
      * @param iss issuer (user identifier)
+     * @param ttl time to live (in seconds
      * @param claims Custom properties to store in the JWT
      * @return HmacToken instance
      * @throws HmacException
      */
-    public static HmacToken getSignedToken(String secret, String iss, Map<String,String> claims) throws HmacException{
+    public static HmacToken getSignedToken(String secret, String iss, Integer ttl,Map<String,String> claims) throws HmacException{
 
         //Generate a random token
         String jwtID = generateToken();
 
         //Generate a signed JWT
-        String jsonWebToken = generateJWT(secret,jwtID, iss, claims);
+        String jsonWebToken = generateJWT(secret,jwtID, iss, ttl, claims);
 
         return new HmacToken(jwtID,secret, jsonWebToken);
     }
@@ -72,12 +73,13 @@ public class HmacSigner {
      * @param secret hmac secret
      * @param jwtID hmac jwtID
      * @param iss issuer
+     * @param ttl time to live (in seconds
      * @param claims List of custom claims
      * @return Signed JWT
      */
-    private static String generateJWT(String secret, String jwtID,String iss, Map<String,String> claims) throws HmacException{
+    private static String generateJWT(String secret, String jwtID,String iss, Integer ttl,Map<String,String> claims) throws HmacException{
         try {
-            return signJWT(secret,jwtID,5,iss,claims);
+            return signJWT(secret,jwtID,ttl,iss,claims);
         } catch (JOSEException e) {
             e.printStackTrace();
             throw new HmacException("Cannot generate JWT",e);
@@ -88,7 +90,7 @@ public class HmacSigner {
      * Sign a Json Web Token
      * @param secret Random secret in base 64
      * @param jwtID random jwtID
-     * @param ttl time to live (in seconds)
+     * @param ttl time to live (in minutes)
      * @param iss issuer
      * @param claims List of custom claims
      * @return A signed json web token
@@ -101,7 +103,7 @@ public class HmacSigner {
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
         builder
                 .jwtID(jwtID)
-                .expirationTime(DateTime.now().plusSeconds(ttl).toDate())
+                .expirationTime(DateTime.now().plusMinutes(ttl).toDate())
                 .issuer(iss);
 
         if(claims != null && !claims.isEmpty()) {
