@@ -21,6 +21,16 @@ user/frog => role USER
 
 
 #Installation
+- Install tsd globally
+````bash
+$ npm -g install tsd
+````
+
+- Install typescript globally
+````bash
+$ npm -g install typescript
+````
+
 - Go to src/main/webapp folder
 - Install npm dependencies
 ````bash
