@@ -1,10 +1,9 @@
-import {Component} from 'angular2/core';
-import {ROUTER_DIRECTIVES, Router, RouteParams} from 'angular2/router';
-import {FormBuilder, Validators} from 'angular2/common';
-import {ControlGroup} from 'angular2/common';
+import {Component} from '@angular/core';
+import {ROUTER_DIRECTIVES, Router, RouteSegment} from '@angular/router';
+import {FormBuilder, Validators,ControlGroup} from '@angular/common';
 import {Account} from '../account/account';
 import {UsersService} from './users.service';
-import {Response} from 'angular2/http';
+import {Response} from '@angular/http';
 
 @Component({
     selector: 'user',
@@ -18,7 +17,7 @@ export class User {
     user:Account;
     userService:UsersService;
     profiles:Array<string>;
-    constructor(router: Router,routeParams:RouteParams,form: FormBuilder,userService:UsersService) {
+    constructor(router: Router,routeSegment:RouteSegment,form: FormBuilder,userService:UsersService) {
         this.user = new Account();
         this.profiles = [];
         this.router = router;
@@ -27,7 +26,7 @@ export class User {
             login: ['', Validators.required],
             profile: ['', Validators.required]
         });
-        this.getUser(routeParams.get('id'));
+        this.getUser(routeSegment.getParam('id'));
         this.getProfiles();
     }
     getUser(id:string):void {
@@ -37,9 +36,9 @@ export class User {
         this.userService.getProfiles().subscribe((profiles:Array<string>) => this.profiles = profiles);
     }
     saveUser():void {
-        this.userService.saveUser(this.user).subscribe(() => this.router.navigate(['Users']));
+        this.userService.saveUser(this.user).subscribe(() => this.router.navigate(['/users']));
     }
     cancel():void {
-        this.router.navigate(['Users']);
+        this.router.navigate(['/users']);
     }
 }

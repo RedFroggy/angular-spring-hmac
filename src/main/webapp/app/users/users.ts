@@ -1,5 +1,5 @@
-import {Component} from 'angular2/core';
-import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
+import {Component} from '@angular/core';
+import {ROUTER_DIRECTIVES, Router} from '@angular/router';
 import {UsersService} from './users.service';
 import {Account} from '../account/account';
 import {IsAuthorized} from '../utils/is-authorized.directive';
@@ -20,6 +20,6 @@ export class Users {
     }
     onSelectUser(event:Event,id:string):void {
         event.preventDefault();
-        this.router.navigate(['User',{id:id}]);
+        this.router.navigate(['/user',id]);
     }
 }

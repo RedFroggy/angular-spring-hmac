@@ -1,11 +1,12 @@
-import {bootstrap}    from 'angular2/platform/browser';
-import {provide}    from 'angular2/core';
-import {ROUTER_PROVIDERS, APP_BASE_HREF, LocationStrategy,HashLocationStrategy } from 'angular2/router';
+import {bootstrap}    from '@angular/platform-browser-dynamic';
+import {provide}    from '@angular/core';
+import {ROUTER_PROVIDERS} from '@angular/router';
+import {APP_BASE_HREF, LocationStrategy,HashLocationStrategy } from '@angular/common';
 import {AppComponent} from './app.component';
-import {HTTP_PROVIDERS, Http,RequestOptions, XHRBackend} from 'angular2/http';
+import {HTTP_PROVIDERS, Http,RequestOptions, XHRBackend} from '@angular/http';
 import {AccountEventsService} from './account/account.events.service';
-import {HmacHttpClient} from './utils/HmacHttpClient.ts';
-import {MockBackend} from 'angular2/http/testing';
+import {HmacHttpClient} from './utils/hmac-http-client';
+import {MockBackend} from '@angular/http/testing';
 
 bootstrap(AppComponent, [
     HTTP_PROVIDERS,

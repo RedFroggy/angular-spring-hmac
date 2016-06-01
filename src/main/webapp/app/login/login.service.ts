@@ -1,23 +1,16 @@
-import {Injectable, Component} from 'angular2/core';
-import {Response,Headers,Http} from 'angular2/http';
+import {Injectable, Component,EventEmitter} from '@angular/core';
+import {Response,Headers,Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Account} from '../account/account';
 import {AccountEventsService} from '../account/account.events.service';
 import {SecurityToken} from '../security/securityToken';
 import {Observable} from 'rxjs/Observable';
-import {EventEmitter} from 'angular2/core';
 import * as AppUtils from '../utils/app.utils';
-import {Router} from 'angular2/router';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class LoginService {
-    http:Http;
-    accountEventService:AccountEventsService;
-    router:Router;
-    constructor(http:Http,accountEventService:AccountEventsService,router: Router) {
-        this.http = http;
-        this.router = router;
-        this.accountEventService = accountEventService;
+    constructor(private http:Http,private accountEventService:AccountEventsService,private router: Router) {
     }
     authenticate(username:string,password:string):Observable<Account> {
 
@@ -62,11 +55,11 @@ export class LoginService {
             this.http.get(AppUtils.BACKEND_API_ROOT_URL + '/logout').subscribe(() => {
                 this.accountEventService.logout(new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN))));
                 this.removeAccount();
-                this.router.navigate(['Login']);
+                this.router.navigate(['/authenticate']);
             });
         } else {
             this.removeAccount();
-            this.router.navigate(['Login']);
+            this.router.navigate(['/authenticate']);
         }
     }
     isAuthorized(roles:Array<string>):boolean {

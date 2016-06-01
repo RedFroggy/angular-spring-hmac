@@ -1,6 +1,5 @@
-System.config({
-    transpiler: 'typescript',
-    typescriptOptions: { emitDecoratorMetadata: true },
-    packages: {'app': {defaultExtension: 'ts'}}
-});
-System.import('app/main').then(null, console.error.bind(console));
+/**
+ * Initialization script for Angular 2
+ * Created by Michael DESIGAUD on 01/06/2016.
+ */
+System.import('app').catch(function(err){ console.error(err); });

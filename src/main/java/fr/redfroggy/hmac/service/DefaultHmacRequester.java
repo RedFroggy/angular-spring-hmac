@@ -27,9 +27,4 @@ public class DefaultHmacRequester implements HmacRequester{
         }
         return null;
     }
-
-    @Override
-    public Boolean isSecretInBase64() {
-        return true;
-    }
 }

@@ -1,5 +1,5 @@
-import {Injectable,Injector} from 'angular2/core';
-import {Http,Response,RequestOptionsArgs, Headers, Request, RequestOptions, ConnectionBackend} from 'angular2/http';
+import {Injectable,Injector} from '@angular/core';
+import {Http,Response,RequestOptionsArgs, Headers, Request, RequestOptions, ConnectionBackend} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {SecurityToken} from '../security/securityToken';
 import * as AppUtils from '../utils/app.utils';
@@ -25,7 +25,7 @@ export class HmacHttpClient extends Http {
 
             let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
             let date:string = new Date().toISOString();
-            let secret:string = atob(securityToken.secretKey);
+            let secret:string = securityToken.secretKey;
 
             let message = method + url + date;
             options.headers.set(AppUtils.HEADER_AUTHENTICATION, securityToken.token);
@@ -38,6 +38,11 @@ export class HmacHttpClient extends Http {
                 options.headers.set(AppUtils.HEADER_X_DIGEST, CryptoJS.HmacMD5(message, secret).toString());
             }
             options.headers.set(AppUtils.HEADER_X_ONCE, date);
+
+            console.log('url',url);
+            console.log('message',message);
+            console.log('secret',secret);
+            console.log('hmac message',options.headers.get(AppUtils.HEADER_X_DIGEST));
         }
 
     }

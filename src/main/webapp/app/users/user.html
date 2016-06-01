@@ -8,7 +8,7 @@
             <div class="form-group">
                 <label for="profile">Profile</label>
                 <select id="profile" [(ngModel)]="user.profile" ngControl="profile" required class="form-control">
-                    <option *ngFor="#profile of profiles" [value]="profile">{{profile}}</option>
+                    <option *ngFor="let profile of profiles" [value]="profile">{{profile}}</option>
                 </select>
             </div>
             <div>

@@ -8,20 +8,20 @@
     <link rel="stylesheet" href="assets/styles/style.css">
     <link rel="icon" href="favicon.ico">
 
+    <!-- Polyfill(s) for older browsers -->
+    <script src="node_modules/core-js/client/shim.min.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/angular2/bundles/angular2-polyfills.min.js"></script>
-    <script src="node_modules/systemjs/dist/system.js"></script>
-    <script src="node_modules/rxjs/bundles/Rx.min.js"></script>
-    <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
-    <script src="node_modules/angular2/bundles/http.dev.js"></script>
-    <script src="node_modules/angular2/bundles/router.dev.js"></script>
-    <script src="node_modules/angular2/bundles/testing.dev.js"></script>
-    <script src="node_modules/typescript/lib/typescript.js"></script>
     <script src="node_modules/lodash/lodash.js"></script>
     <script src="node_modules/crypto-js/crypto-js.js"></script>
     <script src="node_modules/crypto-js/hmac-sha256.js"></script>
     <script src="node_modules/crypto-js/hmac-sha1.js"></script>
     <script src="node_modules/crypto-js/hmac-md5.js"></script>
+
+    <!-- Initialization -->
+    <script src="systemjs.config.js"></script>
     <script src="init.js"></script>
 </head>
 <body>

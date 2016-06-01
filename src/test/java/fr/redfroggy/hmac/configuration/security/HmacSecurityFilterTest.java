@@ -142,7 +142,6 @@ public class HmacSecurityFilterTest {
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
         Mockito.when(hmacRequester.canVerify(request)).thenReturn(true);
         Mockito.when(hmacRequester.getSecret("1")).thenReturn(new String(Base64.encodeBase64(hmacToken.getSecret().getBytes())));
-        Mockito.when(hmacRequester.isSecretInBase64()).thenReturn(true);
 
 
         Mockito.when(request.getHeader(HmacUtils.AUTHENTICATION)).thenReturn(hmacToken.getJwt());

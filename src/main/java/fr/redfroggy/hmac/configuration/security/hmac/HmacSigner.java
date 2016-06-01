@@ -61,7 +61,7 @@ public class HmacSigner {
      */
     public static String generateSecret() throws HmacException {
         try {
-            return Base64.encodeBase64String(generateToken().getBytes("UTF-8"));
+            return Base64.encodeBase64String(generateToken().getBytes("UTF-8")).replace("\n","").replace("\r","");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             throw new HmacException("Cannot encode base64",e);

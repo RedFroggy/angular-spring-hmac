@@ -1,6 +1,6 @@
-import {Component} from 'angular2/core';
-import {ROUTER_DIRECTIVES, Router} from 'angular2/router';
-import {FormBuilder, Validators, ControlGroup} from 'angular2/common';
+import {Component} from '@angular/core';
+import {ROUTER_DIRECTIVES, Router} from '@angular/router';
+import {FormBuilder, Validators, ControlGroup} from '@angular/common';
 import {LoginService} from './login.service';
 import {Account} from '../account/account';
 import {AccountEventsService} from '../account/account.events.service';
@@ -49,7 +49,7 @@ export class Login {
             .subscribe((account) => {
                 this.account = account;
                 console.log('Successfully logged',account);
-                this.router.navigate(['Users']);
+                this.router.navigate(['/users']);
             });
     }
 }

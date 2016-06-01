@@ -1,5 +1,5 @@
-import {Component} from 'angular2/core';
-import {ROUTER_DIRECTIVES, RouteConfig, Route, Router} from 'angular2/router';
+import {Component} from '@angular/core';
+import {ROUTER_DIRECTIVES, Routes, Route, Router,RouteSegment} from '@angular/router';
 import {Login} from './login/login';
 import {Users} from './users/users';
 import {User} from './users/user';
@@ -12,17 +12,18 @@ import {LoginService} from './login/login.service';
     providers: [LoginService],
     directives: [ROUTER_DIRECTIVES,Header]
 })
-@RouteConfig([
-    new Route({path: '/authenticate', component: Login, name: 'Login',useAsDefault: true}),
-    new Route({path: '/users', component: Users, name: 'Users'}),
-    new Route({path: '/user/:id', component: User, name: 'User'})
+@Routes([
+    new Route({path: '/authenticate', component: Login}),
+    new Route({path: '/users', component: Users, }),
+    new Route({path: '/user/:id', component: User,}),
+    new Route({path: '*', component: Login})
 ])
 export class AppComponent {
     constructor(router:Router,loginService:LoginService) {
-        router.subscribe((route) => {
-            if(route !== 'authenticate') {
+        router.changes.subscribe(() => {
+            if(window.location.hash !== '#/authenticate') {
                 if(!loginService.isAuthenticated()) {
-                    router.navigate(['Login']);
+                    router.navigate(['/authenticate']);
                 } else {
                     loginService.sendLoginSuccess();
                 }

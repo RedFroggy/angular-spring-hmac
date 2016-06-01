@@ -79,10 +79,6 @@ public class HmacSecurityFilter extends GenericFilterBean {
 
                 String message = request.getMethod().concat(url.concat(xOnceHeader));
 
-                if (hmacRequester.isSecretInBase64()) {
-                    secret = new String(Base64.decodeBase64(secret));
-                }
-
                 String digestServer = HmacSigner.encodeMac(secret, message, encoding);
                 System.out.println("HMAC JWT: " + jwt);
                 System.out.println("HMAC url digest: " + url);

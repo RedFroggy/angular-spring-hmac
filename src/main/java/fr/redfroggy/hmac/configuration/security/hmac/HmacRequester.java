@@ -21,10 +21,4 @@ public interface HmacRequester {
      * @return secret key
      */
     String getSecret(String iss);
-
-    /**
-     * Is the secret encoded in base 64
-     * @return true if encoded in base 64 , false otherwise
-     */
-    Boolean isSecretInBase64();
 }

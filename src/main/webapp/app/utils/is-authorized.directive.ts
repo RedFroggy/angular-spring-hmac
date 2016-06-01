@@ -1,4 +1,4 @@
-import {Directive,ElementRef,Input} from 'angular2/core';
+import {Directive,ElementRef,Input} from '@angular/core';
 import {LoginService} from '../login/login.service';
 
 @Directive({
