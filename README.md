@@ -35,9 +35,8 @@ $ npm install
 
 - Compile typescript files
 ````bash
-$ npm run ts-compile
+$ tsc
 ````
-It will transpile to javascript and watch for futur change
 
 #To run Java unit tests
 ````bash

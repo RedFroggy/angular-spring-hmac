@@ -6,7 +6,7 @@
     "rootDir": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "sourceRoot": "src/main/webapp/app",
     "inlineSourceMap": false,
     "inlineSources": false
