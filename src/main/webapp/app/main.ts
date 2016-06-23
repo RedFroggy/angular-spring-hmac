@@ -1,6 +1,6 @@
 import {bootstrap}    from '@angular/platform-browser-dynamic';
 import {provide}    from '@angular/core';
-import {ROUTER_PROVIDERS} from '@angular/router';
+import {APP_ROUTER_PROVIDERS} from './app.routes';
 import {APP_BASE_HREF, LocationStrategy,HashLocationStrategy } from '@angular/common';
 import {AppComponent} from './app.component';
 import {HTTP_PROVIDERS, Http,RequestOptions, XHRBackend} from '@angular/http';
@@ -10,7 +10,7 @@ import {MockBackend} from '@angular/http/testing';
 
 bootstrap(AppComponent, [
     HTTP_PROVIDERS,
-    ROUTER_PROVIDERS,
+    APP_ROUTER_PROVIDERS,
     HmacHttpClient,
     AccountEventsService,
     Http,

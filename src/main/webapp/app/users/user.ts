@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {ROUTER_DIRECTIVES, Router, RouteSegment} from '@angular/router';
+import {ROUTER_DIRECTIVES, Router,ActivatedRoute} from '@angular/router';
 import {FormBuilder, Validators,ControlGroup} from '@angular/common';
 import {Account} from '../account/account';
 import {UsersService} from './users.service';
@@ -13,11 +13,10 @@ import {Response} from '@angular/http';
 })
 export class User {
     userForm:ControlGroup;
-    router: Router;
     user:Account;
-    userService:UsersService;
     profiles:Array<string>;
-    constructor(router: Router,routeSegment:RouteSegment,form: FormBuilder,userService:UsersService) {
+    private sub:any;
+    constructor(private router: Router,private userService:UsersService,private route: ActivatedRoute,form: FormBuilder) {
         this.user = new Account();
         this.profiles = [];
         this.router = router;
@@ -26,8 +25,13 @@ export class User {
             login: ['', Validators.required],
             profile: ['', Validators.required]
         });
-        this.getUser(routeSegment.getParam('id'));
         this.getProfiles();
+    }
+    ngOnInit():void {
+        this.sub = this.route.params.subscribe(params => this.getUser(params['id']));
+    }
+    ngOnDestroy():void {
+        this.sub.unsubscribe();
     }
     getUser(id:string):void {
         this.userService.getById(id).subscribe((user:Account) => this.user = user);
