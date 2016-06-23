@@ -21,10 +21,6 @@ user/frog => role USER
 
 
 #Installation
-- Install tsd globally
-````bash
-$ npm -g install tsd
-````
 
 - Install typescript globally
 ````bash
@@ -35,6 +31,11 @@ $ npm -g install typescript
 - Install npm dependencies
 ````bash
 $ npm install
+````
+
+- Compile typescript files
+````bash
+$ tsc
 ````
 
 #To run Java unit tests
