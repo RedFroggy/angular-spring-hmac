@@ -1,13 +1,11 @@
 import {Component} from '@angular/core';
-import {Header} from './header/header';
 import {LoginService} from './login/login.service';
-import {ROUTER_DIRECTIVES, Router} from '@angular/router';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'hmac-app',
     templateUrl:'./app/app.html',
-    providers: [LoginService],
-    directives: [ROUTER_DIRECTIVES,Header]
+    providers: [LoginService]
 })
 export class AppComponent {
     constructor(router:Router,loginService:LoginService) {

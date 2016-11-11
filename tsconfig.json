@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES6",
     "module": "commonjs",
     "noEmitOnError": false,
     "rootDir": ".",
@@ -14,5 +14,5 @@
   "exclude": [
     "src/main/webapp/node_modules"
   ],
-  "compileOnSave": false
+  "compileOnSave": true
 }

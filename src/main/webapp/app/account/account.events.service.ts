@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
-import {Account} from '../account/account';
 
 @Injectable()
 export class AccountEventsService extends Subject<any> {

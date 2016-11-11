@@ -7,21 +7,32 @@
   },
   "dependencies": {
     "angular-utf8-base64": "0.0.2",
-    "@angular/common": "2.0.0-rc.3",
-    "@angular/compiler": "2.0.0-rc.3",
-    "@angular/core": "2.0.0-rc.3",
-    "@angular/http": "2.0.0-rc.3",
-    "@angular/platform-browser": "2.0.0-rc.3",
-    "@angular/platform-browser-dynamic": "2.0.0-rc.3",
-    "@angular/router": "3.0.0-alpha.7",
-    "core-js": "^2.4.0",
+    "@angular/common": "2.1.1",
+    "@angular/compiler": "2.1.1",
+    "@angular/core": "2.1.1",
+    "@angular/forms": "2.1.1",
+    "@angular/http": "2.1.1",
+    "@angular/platform-browser": "2.1.1",
+    "@angular/platform-browser-dynamic": "2.1.1",
+    "@angular/platform-server": "2.1.1",
+    "@angular/router": "3.1.1",
+    "@angular/upgrade": "2.1.1",
+    "core-js": "^2.4.1",
     "bootstrap": "3.3.6",
     "crypto-js": "^3.1.6",
     "jquery": "1.11.3",
     "lodash": "^4.3.0",
-    "rxjs": "5.0.0-beta.6",
+    "ntypescript": "1.201609302242.1",
+    "reflect-metadata": "0.1.8",
+    "rxjs": "5.0.0-rc.2",
     "systemjs": "0.19.9",
     "underscore": "1.8.3",
-    "zone.js": "0.6.12"
+    "zone.js": "0.6.23"
+  },
+  "bin":{
+    "ntsc":"node_modules/ntypescript/bin/ntypescript.js"
+  },
+  "scripts": {
+    "build": "ntsc -p ../../../"
   }
 }

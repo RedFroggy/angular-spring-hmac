@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {ROUTER_DIRECTIVES, Router} from '@angular/router';
-import {FormBuilder, Validators, ControlGroup} from '@angular/common';
+import { Router} from '@angular/router';
+import {FormBuilder, Validators, FormGroup} from '@angular/forms';
 import {LoginService} from './login.service';
 import {Account} from '../account/account';
 import {AccountEventsService} from '../account/account.events.service';
@@ -9,7 +9,6 @@ import {AccountEventsService} from '../account/account.events.service';
 
 @Component({
     selector: 'login',
-    directives:[ROUTER_DIRECTIVES],
     providers: [LoginService],
     templateUrl: './app/login/login.html'
 })
@@ -18,7 +17,7 @@ export class Login {
     password:string;
     router:Router;
     wrongCredentials:boolean;
-    loginForm:ControlGroup;
+    loginForm:FormGroup;
     loginService:LoginService;
     account:Account;
     error:string;
@@ -43,13 +42,12 @@ export class Login {
             }
         });
     }
-    authenticate(event, username, password) {
+    authenticate(event) {
         event.preventDefault();
-        this.loginService.authenticate(username,password)
-            .subscribe((account) => {
-                this.account = account;
-                console.log('Successfully logged',account);
-                this.router.navigate(['/users']);
-            });
+        this.loginService.authenticate(this.loginForm.value.username,this.loginForm.value.password).subscribe(account => {
+            this.account = account;
+            console.log('Successfully logged',account);
+            this.router.navigate(['/users']);
+        });
     }
 }

@@ -1,13 +1,13 @@
 <div class="container">
     <div class="row">
-        <form [ngFormModel]="userForm" (submit)="saveUser()">
+        <form class="form" [formGroup]="userForm" (submit)="saveUser()">
             <div class="form-group">
                 <label for="login">Login</label>
-                <input type="text" id="login" required [(ngModel)]="user.login" ngControl="login" class="form-control">
+                <input type="text" id="login" required [(ngModel)]="user.login" formControlName="login" class="form-control">
             </div>
             <div class="form-group">
                 <label for="profile">Profile</label>
-                <select id="profile" [(ngModel)]="user.profile" ngControl="profile" required class="form-control">
+                <select id="profile" [(ngModel)]="user.profile" formControlName="profile" required class="form-control">
                     <option *ngFor="let profile of profiles" [value]="profile">{{profile}}</option>
                 </select>
             </div>

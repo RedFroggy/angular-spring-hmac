@@ -1,12 +1,10 @@
 import {Component} from '@angular/core';
-import {ROUTER_DIRECTIVES, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {UsersService} from './users.service';
 import {Account} from '../account/account';
-import {IsAuthorized} from '../utils/is-authorized.directive';
 
 @Component({
     selector: 'users',
-    directives:[IsAuthorized],
     templateUrl: './app/users/users.html',
     providers:[UsersService]
 })

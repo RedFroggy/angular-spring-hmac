@@ -1,18 +1,16 @@
 import {Component} from '@angular/core';
-import {ROUTER_DIRECTIVES, Router,ActivatedRoute} from '@angular/router';
-import {FormBuilder, Validators,ControlGroup} from '@angular/common';
+import {Router,ActivatedRoute} from '@angular/router';
+import {FormBuilder, Validators, FormGroup} from '@angular/forms';
 import {Account} from '../account/account';
 import {UsersService} from './users.service';
-import {Response} from '@angular/http';
 
 @Component({
     selector: 'user',
-    directives:[ROUTER_DIRECTIVES],
     templateUrl: './app/users/user.html',
     providers:[UsersService]
 })
 export class User {
-    userForm:ControlGroup;
+    userForm:FormGroup;
     user:Account;
     profiles:Array<string>;
     private sub:any;

@@ -4,7 +4,7 @@
 - Spring Boot
 - Spring Security
 - Spring MVC
-- AngularJS v2
+- Angular 2.1.1
 
 #Features
 - Token based authentication
@@ -19,25 +19,6 @@ admin/frog => role ADMIN
 manager/frog => role MANAGER
 user/frog => role USER
 
-
-#Installation
-
-- Install typescript globally
-````bash
-$ npm -g install typescript
-````
-
-- Go to src/main/webapp folder
-- Install npm dependencies
-````bash
-$ npm install
-````
-
-- Compile typescript files
-````bash
-$ tsc
-````
-
 #To run Java unit tests
 ````bash
 $ mvn test
@@ -47,4 +28,5 @@ $ mvn test
 ````bash
 $ mvn spring-boot:run
 ````
-Then go to http://localhost:8080
+- Npm modules should be automatically installed and typescript files compiled (see pom.xml file)
+- Then go to http://localhost:8080

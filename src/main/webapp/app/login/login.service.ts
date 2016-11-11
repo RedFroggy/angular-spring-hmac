@@ -1,4 +1,4 @@
-import {Injectable, Component,EventEmitter} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Response,Headers,Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Account} from '../account/account';

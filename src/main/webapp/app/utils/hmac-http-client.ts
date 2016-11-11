@@ -1,5 +1,5 @@
-import {Injectable,Injector} from '@angular/core';
-import {Http,Response,RequestOptionsArgs, Headers, Request, RequestOptions, ConnectionBackend} from '@angular/http';
+import {Injectable} from '@angular/core';
+import {Http,Response,RequestOptionsArgs, Headers, RequestOptions, ConnectionBackend} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {SecurityToken} from '../security/securityToken';
 import * as AppUtils from '../utils/app.utils';
