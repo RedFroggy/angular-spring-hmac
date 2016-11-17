@@ -16,7 +16,6 @@ import { Header } from './header/header';
 
 
 import { RoutesModule } from './app.routes';
-import { HeaderModule } from './header/header.module';
 import { AccountModule } from './account/account.module';
 import { LoginModule } from './login/login.module';
 import { UserModule } from './users/user.module';
