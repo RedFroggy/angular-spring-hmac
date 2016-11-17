@@ -16,11 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Authentication service
@@ -28,6 +26,10 @@ import java.util.Map;
  */
 @Service
 public class AuthenticationService {
+
+    public static final String JWT_APP_COOKIE = "hmac-app-jwt";
+    public static final String CSRF_CLAIM_HEADER = "X-HMAC-CSRF";
+    public static final String JWT_CLAIM_LOGIN = "login";
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -64,24 +66,41 @@ public class AuthenticationService {
         }
 
         //Get Hmac signed token
+        String csrfId = UUID.randomUUID().toString();
         Map<String,String> customClaims = new HashMap<>();
         customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
+        customClaims.put(JWT_CLAIM_LOGIN, loginDTO.getLogin());
+        customClaims.put(CSRF_CLAIM_HEADER, csrfId);
 
         //Generate a random secret
-        String secret = HmacSigner.generateSecret();
+        String privateSecret = HmacSigner.generateSecret();
+        String publicSecret = HmacSigner.generateSecret();
 
-        HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(securityUser.getId()), HmacSecurityFilter.JWT_TTL,customClaims);
+        // Jwt is generated using the private key
+        HmacToken hmacToken = HmacSigner.getSignedToken(privateSecret,String.valueOf(securityUser.getId()), HmacSecurityFilter.JWT_TTL,customClaims);
 
         for(UserDTO userDTO : MockUsers.getUsers()){
             if(userDTO.getId().equals(securityUser.getId())){
-                userDTO.setSecretKey(secret);
+                //Store in cache both private an public secrets
+                userDTO.setPublicSecret(publicSecret);
+                userDTO.setPrivateSecret(privateSecret);
             }
         }
 
-        //Set all tokens in http response headers
-        response.setHeader(HmacUtils.X_TOKEN_ACCESS, hmacToken.getJwt());
-        response.setHeader(HmacUtils.X_SECRET, hmacToken.getSecret());
+        // Add jwt cookie
+        Cookie jwtCookie = new Cookie(JWT_APP_COOKIE,hmacToken.getJwt());
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(20*60);
+        //Cookie cannot be accessed via JavaScript
+        jwtCookie.setHttpOnly(true);
+
+        // Set public secret and encoding in headers
+        response.setHeader(HmacUtils.X_SECRET, publicSecret);
         response.setHeader(HttpHeaders.WWW_AUTHENTICATE, HmacUtils.HMAC_SHA_256);
+        response.setHeader(CSRF_CLAIM_HEADER, csrfId);
+
+        //Set JWT as a cookie
+        response.addCookie(jwtCookie);
 
         UserDTO userDTO = new UserDTO();
         userDTO.setId(securityUser.getId());
@@ -104,7 +123,7 @@ public class AuthenticationService {
 
             UserDTO userDTO = MockUsers.findById(securityUser.getId());
             if(userDTO != null){
-                userDTO.setSecretKey(null);
+                userDTO.setPublicSecret(null);
             }
 
         }

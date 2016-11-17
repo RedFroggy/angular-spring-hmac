@@ -2,11 +2,11 @@
  * Login factory
  * Created by Michael DESIGAUD on 14/02/2016.
  */
-hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope,hmacInterceptor){
+hmacApp.factory('LoginFactory',function($http, $rootScope,hmacInterceptor){
     return {
         authenticate: function(login,password){
             return $http.post('http://localhost:8080/api/authenticate',{login:login,password:password}).success(function(user, status, headers){
-                $cookieStore.put('hmacApp-account', JSON.stringify(user));
+                localStorage.setItem('hmacApp-account', JSON.stringify(user));
 
                 hmacInterceptor.readHmacRequest(headers);
 
@@ -15,11 +15,11 @@ hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope,hmacInter
             });
         },
         isAuthenticated:function(){
-            return !!$cookieStore.get('hmacApp-account') && hmacInterceptor.isSecured();
+            return !!localStorage.getItem('hmacApp-account') && hmacInterceptor.isSecured();
         },
         isAuthorized:function(roles){
-            if(!!$cookieStore.get('hmacApp-account')){
-                var account = JSON.parse($cookieStore.get('hmacApp-account'));
+            if(!!localStorage.getItem('hmacApp-account')){
+                var account = JSON.parse(localStorage.getItem('hmacApp-account'));
                 var authorized = false;
                 angular.forEach(roles,function(role){
                     if(account && account.authorities && account.authorities.indexOf(role) !== -1){
@@ -31,12 +31,13 @@ hmacApp.factory('LoginFactory',function($http, $cookieStore,$rootScope,hmacInter
             return false;
         },
         getAccount:function(){
-            if(!!$cookieStore.get('hmacApp-account')){
-                return JSON.parse($cookieStore.get('hmacApp-account'));
+            if(!!localStorage.getItem('hmacApp-account')){
+                return JSON.parse(localStorage.getItem('hmacApp-account'));
             }
         },
         removeAccount:function(){
-            $cookieStore.remove('hmacApp-account');
+            localStorage.removeItem('hmacApp-account');
+            localStorage.removeItem('x-hmac-csrf');
             hmacInterceptor.removeSecurity();
             $rootScope.authenticated = false;
         },

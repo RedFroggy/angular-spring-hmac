@@ -9,7 +9,7 @@ hmacApp.provider('hmacInterceptor',function () {
         rejectedApis:[]
     };
 
-    this.$get = ['$log','base64','$cookieStore',function($log,base64,$cookieStore){
+    this.$get = ['$log','$cookieStore',function($log){
         var self = this;
         return {
             request:function(request) {
@@ -25,10 +25,10 @@ hmacApp.provider('hmacInterceptor',function () {
 
                 //Process hmac encode
                 if (canEncode) {
-                    var security = JSON.parse($cookieStore.get(self.config.securityToken));
+                    var security = JSON.parse(localStorage.getItem(self.config.securityToken));
 
-                    //Get secret from session storage and decode from base64
-                    var secret = base64.decode(security.secretKey);
+                    //Get secret from session storage
+                    var secret = security.publicSecret;
 
                     //Create an ISO format date
                     var date = new Date().toISOString();
@@ -38,9 +38,6 @@ hmacApp.provider('hmacInterceptor',function () {
                     var message = request.method + url + date;
 
                     var encodingLevel = security.securityLevel;
-
-                    //Set header "Authentication" with token
-                    request.headers["Authentication"] = security.token;
 
                     //Encrypt message with secret key and a given hash algorithm, set the result (digest) in the "X-Digest" http header
                     if (encodingLevel === "HmacSHA256") {
@@ -52,6 +49,8 @@ hmacApp.provider('hmacInterceptor',function () {
                     else if (encodingLevel[0] === "HmacMD5") {
                         request.headers["X-Digest"] = CryptoJS.HmacMD5(message, secret);
                     }
+
+                    request.headers["x-hmac-csrf"] = localStorage.getItem('x-hmac-csrf');
 
                     //Set header "X-Once" with current date
                     request.headers["X-Once"] = date;
@@ -65,35 +64,26 @@ hmacApp.provider('hmacInterceptor',function () {
                 }
                 return request;
             },
-            response:function(response){
-                if(response.headers){
-                    var headers =  response.headers();
-                    var security = $cookieStore.get(self.config.securityToken);
-                    if(security){
-                        security["token"] = headers["x-tokenaccess"];
-                    }
-                }
-                return response;
-            },
             readHmacRequest:function(headers){
                 //Retrieve headers
                 var headerList = headers();
 
                 var security = {};
+
                 //Secret key header
-                security["secretKey"] = headerList["x-secret"];
-                //Token header
-                security["token"] = headerList["x-tokenaccess"];
+                security["publicSecret"] = headerList["x-secret"];
+
                 //Security level
                 security["securityLevel"] = headerList["www-authenticate"];
 
-                $cookieStore.put(self.config.securityToken, JSON.stringify(security));
+                localStorage.setItem('x-hmac-csrf', headerList['x-hmac-csrf']);
+                localStorage.setItem(self.config.securityToken, JSON.stringify(security));
             },
             isSecured:function(){
-                return !!$cookieStore.get(self.config.securityToken);
+                return !!localStorage.getItem(self.config.securityToken);
             },
             removeSecurity:function(){
-                $cookieStore.remove(self.config.securityToken);
+                localStorage.removeItem(self.config.securityToken);
             }
        };
     }];
