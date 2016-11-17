@@ -1,18 +1,21 @@
 <div class="container">
     <div class="row">
         <table class="table table-hover">
-            <tr>
-                <th>#</th>
-                <th>Login</th>
-                <th>Profile</th>
-                <th [isAuthorized]="'ROLE_ADMIN'">Authorities</th>
-            </tr>
-            <tr *ngFor='let user of users'>
-                <td>{{user.id}}</td>
-                <td><a href="" (click)="onSelectUser($event,user.id)">{{user.login}}</a></td>
-                <td>{{user.profile}}</td>
-                <td [isAuthorized]="'ROLE_ADMIN'">{{user.authorities.join(',')}}</td>
-            </tr>
+            <thead></thead>
+            <tbody>
+                <tr>
+                    <th>#</th>
+                    <th>Login</th>
+                    <th>Profile</th>
+                    <th [isAuthorized]="'ROLE_ADMIN'">Authorities</th>
+                </tr>
+                <tr *ngFor='let user of users'>
+                    <td>{{user.id}}</td>
+                    <td><a href="" (click)="onSelectUser($event,user.id)">{{user.login}}</a></td>
+                    <td>{{user.profile}}</td>
+                    <td [isAuthorized]="'ROLE_ADMIN'">{{user.authorities.join(',')}}</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>

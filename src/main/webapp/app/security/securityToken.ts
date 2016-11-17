@@ -1,8 +1,7 @@
 export class SecurityToken {
-    secretKey:string;
-    token:string;
+    publicSecret:string;
     securityLevel:string;
-    constructor(token:{secretKey:string,token:string,securityLevel:string}) {
+    constructor(token:{publicSecret:string,securityLevel:string}) {
         _.assignIn(this, token);
     }
     isEncoding(encoding:string):boolean {

@@ -1,6 +1,6 @@
 package fr.redfroggy.hmac.configuration.security.hmac;
 
-import org.apache.commons.codec.binary.Base64;
+import fr.redfroggy.hmac.service.AuthenticationService;
 import org.apache.commons.io.Charsets;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
@@ -9,6 +9,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,6 +31,23 @@ public class HmacSecurityFilter extends GenericFilterBean {
         this.hmacRequester = hmacRequester;
     }
 
+    /**
+     * Find a cookie which contain a JWT
+     * @param request current http request
+     * @return Cookie found, null otherwise
+     */
+    private Cookie findJwtCookie(HttpServletRequest request) {
+        if(request.getCookies() == null || request.getCookies().length == 0) {
+            return null;
+        }
+        for(Cookie cookie : request.getCookies()) {
+            if(cookie.getName().contains(AuthenticationService.JWT_APP_COOKIE)) {
+                return cookie;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
@@ -42,7 +60,10 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 filterChain.doFilter(request, response);
             } else {
                 //Get Authentication header
-                String jwt = request.getHeader(HmacUtils.AUTHENTICATION);
+                Cookie jwtCookie = findJwtCookie(request);
+                Assert.notNull(jwtCookie,"No jwt cookie found");
+
+                String jwt = jwtCookie.getValue();
 
                 if (jwt == null || jwt.isEmpty()) {
                     throw new HmacException("The JWT is missing from the '" + HmacUtils.AUTHENTICATION + "' header");
@@ -70,15 +91,13 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 String encoding = HmacSigner.getJwtClaim(jwt, HmacSigner.ENCODING_CLAIM_PROPERTY);
                 String iss = HmacSigner.getJwtIss(jwt);
 
-                String secret = hmacRequester.getSecret(iss);
+                //Get public secret key
+                String secret = hmacRequester.getPublicSecret(iss);
                 Assert.notNull(secret, "Secret key cannot be null");
-
-                Assert.isTrue(HmacSigner.verifyJWT(jwt,secret),"The Json Web Token is invalid");
-
-                Assert.isTrue(!HmacSigner.isJwtExpired(jwt),"The Json Web Token is expired");
 
                 String message = request.getMethod().concat(url.concat(xOnceHeader));
 
+                //Digest are calculated using a public shared secret
                 String digestServer = HmacSigner.encodeMac(secret, message, encoding);
                 System.out.println("HMAC JWT: " + jwt);
                 System.out.println("HMAC url digest: " + url);

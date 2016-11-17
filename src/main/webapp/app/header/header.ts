@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {AccountEventsService} from '../account/account.events.service';
 import {LoginService} from '../login/login.service';
-import {Router} from '@angular/router';
 
 @Component({
     selector: 'header',

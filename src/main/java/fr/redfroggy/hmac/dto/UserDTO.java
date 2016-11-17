@@ -3,9 +3,7 @@ package fr.redfroggy.hmac.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,7 +25,10 @@ public class UserDTO {
     private List<String> authorities;
 
     @JsonIgnore
-    private String secretKey;
+    private String publicSecret;
+
+    @JsonIgnore
+    private String privateSecret;
 
     private Profile profile;
 
@@ -71,11 +72,19 @@ public class UserDTO {
         this.password = password;
     }
 
-    public String getSecretKey() {
-        return secretKey;
+    public String getPublicSecret() {
+        return publicSecret;
     }
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public void setPublicSecret(String publicSecret) {
+        this.publicSecret = publicSecret;
+    }
+
+    public void setPrivateSecret(String privateSecret) {
+        this.privateSecret = privateSecret;
+    }
+
+    public String getPrivateSecret() {
+        return privateSecret;
     }
 }

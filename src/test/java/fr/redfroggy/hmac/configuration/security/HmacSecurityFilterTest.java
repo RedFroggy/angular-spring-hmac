@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -76,7 +75,7 @@ public class HmacSecurityFilterTest {
     public void doFilterHmac() throws IOException, ServletException, HmacException {
 
         Mockito.when(hmacRequester.canVerify(request)).thenReturn(true);
-        Mockito.when(hmacRequester.getSecret("1")).thenReturn(hmacToken.getSecret());
+        Mockito.when(hmacRequester.getPublicSecret("1")).thenReturn(hmacToken.getSecret());
 
 
         Mockito.when(request.getHeader(HmacUtils.AUTHENTICATION)).thenReturn(hmacToken.getJwt());
@@ -141,7 +140,7 @@ public class HmacSecurityFilterTest {
 
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
         Mockito.when(hmacRequester.canVerify(request)).thenReturn(true);
-        Mockito.when(hmacRequester.getSecret("1")).thenReturn(new String(Base64.encodeBase64(hmacToken.getSecret().getBytes())));
+        Mockito.when(hmacRequester.getPublicSecret("1")).thenReturn(new String(Base64.encodeBase64(hmacToken.getSecret().getBytes())));
 
 
         Mockito.when(request.getHeader(HmacUtils.AUTHENTICATION)).thenReturn(hmacToken.getJwt());

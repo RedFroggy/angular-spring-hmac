@@ -21,12 +21,12 @@ export class LoginService {
             .map((res:Response) => {
                 let securityToken:SecurityToken = new SecurityToken(
                     {
-                    secretKey:res.headers.get(AppUtils.HEADER_X_SECRET),
-                    token:res.headers.get(AppUtils.HEADER_X_TOKEN_ACCESS),
+                    publicSecret:res.headers.get(AppUtils.HEADER_X_SECRET),
                     securityLevel:res.headers.get(AppUtils.HEADER_WWW_AUTHENTICATE)
                     }
                 );
 
+                localStorage.setItem(AppUtils.CSRF_CLAIM_HEADER, res.headers.get(AppUtils.CSRF_CLAIM_HEADER));
                 localStorage.setItem(AppUtils.STORAGE_ACCOUNT_TOKEN,res.text());
                 localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
 
@@ -47,6 +47,7 @@ export class LoginService {
     removeAccount():void {
         localStorage.removeItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
         localStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
+        localStorage.removeItem(AppUtils.CSRF_CLAIM_HEADER);
     }
     logout(callServer:boolean = true):void {
         console.log('Logging out');

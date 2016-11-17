@@ -5,6 +5,7 @@ export const HEADER_X_DIGEST:string = 'X-Digest';
 export const HEADER_X_ONCE:string = 'X-Once';
 export const HEADER_WWW_AUTHENTICATE:string = 'WWW-Authenticate';
 export const HEADER_AUTHENTICATION:string = 'Authentication';
+export const CSRF_CLAIM_HEADER:string = "X-HMAC-CSRF";
 
 //Local storage keys
 export const STORAGE_ACCOUNT_TOKEN:string = 'hmacApp-account';

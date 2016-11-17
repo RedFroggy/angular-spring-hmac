@@ -16,9 +16,9 @@ public interface HmacRequester {
     Boolean canVerify(HttpServletRequest request);
 
     /**
-     * Get the stored secret (locally,remotely,cache,etc..)
+     * Get the stored public secret (locally,remotely,cache,etc..)
      * @param iss issuer
      * @return secret key
      */
-    String getSecret(String iss);
+    String getPublicSecret(String iss);
 }

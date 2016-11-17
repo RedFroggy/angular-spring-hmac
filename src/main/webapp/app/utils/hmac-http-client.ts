@@ -25,10 +25,10 @@ export class HmacHttpClient extends Http {
 
             let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
             let date:string = new Date().toISOString();
-            let secret:string = securityToken.secretKey;
+            let secret:string = securityToken.publicSecret;
 
             let message = method + url + date;
-            options.headers.set(AppUtils.HEADER_AUTHENTICATION, securityToken.token);
+            options.headers.set(AppUtils.CSRF_CLAIM_HEADER, localStorage.getItem(AppUtils.CSRF_CLAIM_HEADER));
 
             if (securityToken.isEncoding('HmacSHA256')) {
                 options.headers.set(AppUtils.HEADER_X_DIGEST, CryptoJS.HmacSHA256(message, secret).toString());
@@ -59,7 +59,6 @@ export class HmacHttpClient extends Http {
         if(res.ok && res.headers) {
             let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
             if(securityToken) {
-                securityToken.token = res.headers.get(AppUtils.HEADER_X_TOKEN_ACCESS);
                 localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
             }
         }

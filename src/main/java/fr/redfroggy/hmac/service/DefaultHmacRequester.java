@@ -20,10 +20,10 @@ public class DefaultHmacRequester implements HmacRequester{
     }
 
     @Override
-    public String getSecret(String iss) {
+    public String getPublicSecret(String iss) {
         UserDTO userDTO = MockUsers.findById(Integer.valueOf(iss));
         if(userDTO != null){
-            return userDTO.getSecretKey();
+            return userDTO.getPublicSecret();
         }
         return null;
     }

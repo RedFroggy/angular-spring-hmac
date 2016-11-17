@@ -94,8 +94,8 @@ public class AuthenticationServiceTest {
 
         UserDTO userDTO = MockUsers.findById(userId);
         Assert.assertNotNull(userDTO);
-        userDTO.setSecretKey("secretKey");
-        Assert.assertNotNull(userDTO.getSecretKey());
+        userDTO.setPublicSecret("secretKey");
+        Assert.assertNotNull(userDTO.getPublicSecret());
 
         PowerMockito.mockStatic(SecurityContextHolder.class);
         UsernamePasswordAuthenticationToken passwordAuthenticationToken = PowerMockito.mock(UsernamePasswordAuthenticationToken.class);
@@ -110,7 +110,7 @@ public class AuthenticationServiceTest {
 
         userDTO = MockUsers.findById(userId);
         Assert.assertNotNull(userDTO);
-        Assert.assertNull(userDTO.getSecretKey());
+        Assert.assertNull(userDTO.getPublicSecret());
 
     }
 
