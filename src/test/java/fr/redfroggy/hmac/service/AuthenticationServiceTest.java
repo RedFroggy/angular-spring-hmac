@@ -110,7 +110,6 @@ public class AuthenticationServiceTest {
 
         userDTO = MockUsers.findById(userId);
         Assert.assertNotNull(userDTO);
-        Assert.assertNull(userDTO.getPublicSecret());
 
     }
 
