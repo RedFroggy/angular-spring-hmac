@@ -4,7 +4,7 @@
 - Spring Boot
 - Spring Security
 - Spring MVC
-- Angular 2.1.1
+- Angular 2.2.0
 
 #Features
 - Token based authentication
