@@ -1,6 +1,7 @@
 package fr.redfroggy.hmac.configuration.security;
 
 import fr.redfroggy.hmac.configuration.security.hmac.*;
+import fr.redfroggy.hmac.service.AuthenticationService;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -13,10 +14,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -77,7 +80,13 @@ public class HmacSecurityFilterTest {
         Mockito.when(hmacRequester.canVerify(request)).thenReturn(true);
         Mockito.when(hmacRequester.getPublicSecret("1")).thenReturn(hmacToken.getSecret());
 
+        Cookie jwtCookie = new Cookie(AuthenticationService.JWT_APP_COOKIE,hmacToken.getJwt());
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(20*60);
+        //Cookie cannot be accessed via JavaScript
+        jwtCookie.setHttpOnly(true);
 
+        Mockito.when(request.getCookies()).thenReturn((Cookie[]) Arrays.asList(jwtCookie).toArray());
         Mockito.when(request.getHeader(HmacUtils.AUTHENTICATION)).thenReturn(hmacToken.getJwt());
         Mockito.when(request.getHeader(HmacUtils.X_DIGEST)).thenReturn(getDigest());
         Mockito.when(request.getHeader(HmacUtils.X_ONCE)).thenReturn(isoDate);
