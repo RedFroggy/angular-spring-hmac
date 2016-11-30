@@ -19,7 +19,7 @@ export class HmacHttpClient extends Http {
         super(_backend,_defaultOptions);
         this.accountEventsService = accountEventsService;
     }
-    addSecurityHeader(url:string,method:string,options: RequestOptionsArgs):void {
+    addSecurityHeader(url:string,method:string,options: RequestOptionsArgs,body: any):void {
 
         if(AppUtils.UrlMatcher.matches(url)) {
 
@@ -27,7 +27,12 @@ export class HmacHttpClient extends Http {
             let date:string = new Date().toISOString();
             let secret:string = securityToken.publicSecret;
 
-            let message = method + url + date;
+            let message = '';
+            if (method === 'PUT' || method === 'POST' || method === 'PATCH') {
+               message = method + body + url + date;
+            } else {
+                message = method + url + date;
+            }
             options.headers.set(AppUtils.CSRF_CLAIM_HEADER, localStorage.getItem(AppUtils.CSRF_CLAIM_HEADER));
 
             if (securityToken.isEncoding('HmacSHA256')) {
@@ -74,7 +79,7 @@ export class HmacHttpClient extends Http {
     }
     get(url: string, options?: RequestOptionsArgs): Observable<Response> {
         options = this.setOptions(options);
-        this.addSecurityHeader(url,'GET',options);
+        this.addSecurityHeader(url,'GET',options,null);
 
         return Observable.create((observer:Observer<Response>) => {
             super.get(url, options)
@@ -87,7 +92,7 @@ export class HmacHttpClient extends Http {
     }
     post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
         options = this.setOptions(options);
-        this.addSecurityHeader(url,'POST',options);
+        this.addSecurityHeader(url,'POST',options, body);
 
         return Observable.create((observer:Observer<Response>) => {
             super.post(url,body,options)
@@ -100,7 +105,7 @@ export class HmacHttpClient extends Http {
     }
     put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
         options = this.setOptions(options);
-        this.addSecurityHeader(url,'PUT',options);
+        this.addSecurityHeader(url,'PUT',options, body);
 
         return Observable.create((observer:Observer<Response>) => {
             super.put(url,body,options)
