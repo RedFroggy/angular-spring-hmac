@@ -35,7 +35,12 @@ hmacApp.provider('hmacInterceptor',function () {
 
                     var url = request.url;
 
-                    var message = request.method + url + date;
+                    var message = '';
+                    if (request.method === 'PUT' || request.method === 'POST' || request.method === 'PATCH') {
+                        message = request.method + JSON.stringify(request.data) + url + date;
+                    } else {
+                        message = request.method + url + date;
+                    }
 
                     var encodingLevel = security.securityLevel;
 
@@ -65,6 +70,7 @@ hmacApp.provider('hmacInterceptor',function () {
                 return request;
             },
             readHmacRequest:function(headers){
+
                 //Retrieve headers
                 var headerList = headers();
 

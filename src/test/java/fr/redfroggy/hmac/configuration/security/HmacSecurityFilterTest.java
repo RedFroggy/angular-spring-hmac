@@ -14,10 +14,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,6 +44,9 @@ public class HmacSecurityFilterTest {
     @Mock
     private HmacRequester hmacRequester;
 
+    @Mock
+    private ServletInputStream inputStream;
+
     @InjectMocks
     private HmacSecurityFilter hmacSecurityFilter;
 
@@ -52,11 +57,13 @@ public class HmacSecurityFilterTest {
     private String url = "http://localhost/api/users";
 
     @Before
-    public void setUp() throws HmacException {
+    public void setUp() throws HmacException, IOException {
         hmacSecurityFilter = new HmacSecurityFilter(hmacRequester);
         String secret = HmacSigner.generateSecret();
         hmacToken = HmacSigner.getSignedToken(secret,String.valueOf("1"),20,new HashMap<String, String>(){{put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);}});
         isoDate = DateTime.now().toDateTimeISO().toString();
+
+        Mockito.when(request.getInputStream()).thenReturn(inputStream);
     }
 
     /**
@@ -69,7 +76,7 @@ public class HmacSecurityFilterTest {
 
         hmacSecurityFilter.doFilter(request,response,filterChain);
 
-        Mockito.verify(filterChain,Mockito.times(1)).doFilter(request,response);
+        Mockito.verify(filterChain,Mockito.times(1)).doFilter(Mockito.any(WrappedRequest.class), Mockito.any(HttpServletResponse.class));
     }
 
     /**
@@ -98,7 +105,7 @@ public class HmacSecurityFilterTest {
 
         hmacSecurityFilter.doFilter(request,response,filterChain);
 
-        Mockito.verify(filterChain,Mockito.times(1)).doFilter(request,response);
+        Mockito.verify(filterChain,Mockito.times(1)).doFilter(Mockito.any(WrappedRequest.class), Mockito.any(HttpServletResponse.class));
     }
 
     /**

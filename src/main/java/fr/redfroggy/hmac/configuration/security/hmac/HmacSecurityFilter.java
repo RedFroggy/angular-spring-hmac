@@ -1,5 +1,6 @@
 package fr.redfroggy.hmac.configuration.security.hmac;
 
+import fr.redfroggy.hmac.configuration.security.WrappedRequest;
 import fr.redfroggy.hmac.service.AuthenticationService;
 import org.apache.commons.io.Charsets;
 import org.springframework.util.Assert;
@@ -53,11 +54,13 @@ public class HmacSecurityFilter extends GenericFilterBean {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        WrappedRequest wrappedRequest = new WrappedRequest(request);
+
         try {
             Assert.notNull(hmacRequester, "hmacRequester must not be null");
 
             if (!hmacRequester.canVerify(request)) {
-                filterChain.doFilter(request, response);
+                filterChain.doFilter(wrappedRequest, response);
             } else {
                 //Get Authentication header
                 Cookie jwtCookie = findJwtCookie(request);
@@ -95,7 +98,12 @@ public class HmacSecurityFilter extends GenericFilterBean {
                 String secret = hmacRequester.getPublicSecret(iss);
                 Assert.notNull(secret, "Secret key cannot be null");
 
-                String message = request.getMethod().concat(url.concat(xOnceHeader));
+                String message;
+                if ("POST".equals(request.getMethod()) || "PUT".equals(request.getMethod()) || "PATCH".equals(request.getMethod())) {
+                    message = request.getMethod().concat(wrappedRequest.getBody()).concat(url).concat(xOnceHeader);
+                } else {
+                    message = request.getMethod().concat(url).concat(xOnceHeader);
+                }
 
                 //Digest are calculated using a public shared secret
                 String digestServer = HmacSigner.encodeMac(secret, message, encoding);
@@ -114,7 +122,7 @@ public class HmacSecurityFilter extends GenericFilterBean {
                     HmacToken hmacToken = HmacSigner.getSignedToken(secret,String.valueOf(iss),JWT_TTL,customClaims);
                     response.setHeader(HmacUtils.X_TOKEN_ACCESS, hmacToken.getJwt());
 
-                    filterChain.doFilter(request, response);
+                    filterChain.doFilter(wrappedRequest, response);
                 } else {
                     System.out.println("Server message: " + message);
                     throw new HmacException("Digest are not matching! Client: " + digestClient + " / Server: " + digestServer);
