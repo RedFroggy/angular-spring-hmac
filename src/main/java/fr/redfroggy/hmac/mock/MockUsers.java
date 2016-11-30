@@ -91,7 +91,7 @@ public class MockUsers {
     public static UserDTO update(UserDTO newUserDTO){
         UserDTO existingUser = findById(newUserDTO.getId());
         if(existingUser != null){
-            BeanUtils.copyProperties(newUserDTO,existingUser,"password","secretKey");
+            BeanUtils.copyProperties(newUserDTO,existingUser,"password","publicSecret");
             existingUser.setAuthorities(authorities.get(existingUser.getProfile()));
         }
         return existingUser;
