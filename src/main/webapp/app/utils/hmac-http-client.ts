@@ -23,9 +23,9 @@ export class HmacHttpClient extends Http {
 
         if(AppUtils.UrlMatcher.matches(url)) {
 
-            let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
+            let securityToken:SecurityToken = new SecurityToken(JSON.parse(this.getFromStorage(AppUtils.STORAGE_SECURITY_TOKEN)));
             let date:string = new Date().toISOString();
-            let secret:string = securityToken.publicSecret;
+            let secret:string = securityToken.secret;
 
             let message = '';
             if (method === 'PUT' || method === 'POST' || method === 'PATCH') {
@@ -33,7 +33,8 @@ export class HmacHttpClient extends Http {
             } else {
                 message = method + url + date;
             }
-            options.headers.set(AppUtils.CSRF_CLAIM_HEADER, localStorage.getItem(AppUtils.CSRF_CLAIM_HEADER));
+
+            console.log('securityToken', securityToken);
 
             if (securityToken.isEncoding('HmacSHA256')) {
                 options.headers.set(AppUtils.HEADER_X_DIGEST, CryptoJS.HmacSHA256(message, secret).toString());
@@ -62,9 +63,9 @@ export class HmacHttpClient extends Http {
     }
     mapResponse(res:Response,observer:Observer<Response>):void {
         if(res.ok && res.headers) {
-            let securityToken:SecurityToken = new SecurityToken(JSON.parse(localStorage.getItem(AppUtils.STORAGE_SECURITY_TOKEN)));
+            let securityToken:SecurityToken = new SecurityToken(JSON.parse(this.getFromStorage(AppUtils.STORAGE_SECURITY_TOKEN)));
             if(securityToken) {
-                localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
+                this.setToStorage(AppUtils.STORAGE_SECURITY_TOKEN, securityToken);
             }
         }
         observer.next(res);
@@ -73,7 +74,7 @@ export class HmacHttpClient extends Http {
     catchResponse(res:Response,observer:Observer<Response>):void {
         if(res.status === 403) {
             console.log('Unauthorized request:',res.text());
-            this.accountEventsService.logout({error:res.text()});
+            //this.accountEventsService.logout({error:res.text()});
         }
         observer.complete();
     }
@@ -115,5 +116,20 @@ export class HmacHttpClient extends Http {
                     this.catchResponse(res,observer);
                 });
         });
+    }
+    private setToStorage(key: string, value: any): void {
+        let elem: any = localStorage.getItem(key);
+        if(!elem) {
+            sessionStorage.setItem(key,JSON.stringify(value));
+        } else {
+            localStorage.setItem(key,JSON.stringify(value));
+        }
+    }
+    private getFromStorage(key: string): any {
+        let elem: any = localStorage.getItem(key);
+        if(!elem) {
+            return sessionStorage.getItem(key);
+        }
+        return elem;
     }
 }

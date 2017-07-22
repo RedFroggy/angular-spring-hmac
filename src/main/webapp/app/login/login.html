@@ -15,6 +15,13 @@
                             <input type="password" class="form-control" required formControlName="password"
                                    name="password" id="password" placeholder="password">
                         </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" id="rememberMe" name="rememberMe"
+                                       formControlName="rememberMe" [ngModel]="loginForm.value.rememberMe" type="checkbox">
+                                Remember Me
+                            </label>
+                        </div>
                         <button type="submit" [disabled]="!loginForm.valid" class="btn btn-primary">Login</button>
                     </form>
                 </div>

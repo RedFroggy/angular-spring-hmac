@@ -16,6 +16,7 @@ export class User {
     private sub:any;
     constructor(private router: Router,private userService:UsersService,private route: ActivatedRoute,form: FormBuilder) {
         this.user = new Account();
+        this.user.profile = {};
         this.profiles = [];
         this.router = router;
         this.userService = userService;

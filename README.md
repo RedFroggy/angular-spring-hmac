@@ -1,18 +1,17 @@
 #HMAC Implementation using Spring and Angular [![Build Status](https://travis-ci.org/RedFroggy/angular-spring-hmac.svg?branch=master)](https://travis-ci.org/RedFroggy/angular-spring-hmac)
 
 #Stack
-- Spring Boot
-- Spring Security
-- Spring MVC
-- Angular 2.2.0
+- Spring Boot 1.5.4
+- Spring 4.3.9
+- Spring Security 4.2.3
+- Angular 4.1.2
 
 #Features
 - Token based authentication
 - Json Web Token  
 - HMAC implementation
 - HMAC Filter used by Spring Security
-- HMAC Factory for AngularJS
-- Security utility class
+- HMAC implementation in Angular 4
 
 #Credentials
 admin/frog => role ADMIN

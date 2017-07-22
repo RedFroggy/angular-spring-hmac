@@ -15,7 +15,7 @@ export class Header {
         accountEventService.subscribe((account) => {
             if(!account.authenticated) {
                 this.authenticated = false;
-                this.loginService.logout(false);
+                this.loginService.logout();
             } else {
                 this.authenticated = true;
             }
@@ -23,6 +23,7 @@ export class Header {
     }
     logout(event:Event):void {
         event.preventDefault();
+        this.authenticated = false;
         this.loginService.logout();
     }
 }

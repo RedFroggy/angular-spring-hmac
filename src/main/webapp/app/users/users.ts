@@ -20,4 +20,7 @@ export class Users {
         event.preventDefault();
         this.router.navigate(['/user',id]);
     }
+    getAuthorities(user: {profile:{authorities: Array<{id: number, name: string}>}}): any {
+        return user.profile.authorities.map( a => a.name).join(',');
+    }
 }

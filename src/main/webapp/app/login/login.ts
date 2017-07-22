@@ -27,7 +27,8 @@ export class Login {
         this.loginService = loginService;
         this.loginForm = form.group({
             username: ['', Validators.required],
-            password: ['', Validators.required]
+            password: ['', Validators.required],
+            rememberMe: false
         });
 
         accountEventService.subscribe((account) => {
@@ -44,7 +45,8 @@ export class Login {
     }
     authenticate(event) {
         event.preventDefault();
-        this.loginService.authenticate(this.loginForm.value.username,this.loginForm.value.password).subscribe(account => {
+        this.loginService.authenticate(this.loginForm.value.username,
+            this.loginForm.value.password, this.loginForm.value.rememberMe).subscribe(account => {
             this.account = account;
             console.log('Successfully logged',account);
             this.router.navigate(['/users']);

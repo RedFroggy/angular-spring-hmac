@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:hmacdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    platform: h2
+    username: admin
+    password: admin
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        use_sql_comments: true
+        format_sql: true
+  h2:
+    console:
+      path: /console
+      settings:
+          trace: false
+
+liquibase:
+    contexts: dev
+
+security:
+  jwt:
+    maxAge: 1800 #cookie max age in seconds
+    secret: f09cce0a0753496b9baaae70b343a15f
+  hmac:
+    secret: e2aab888483944eb908a26572f26c5d5

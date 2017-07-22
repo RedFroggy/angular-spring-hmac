@@ -12,23 +12,28 @@ import {Router} from '@angular/router';
 export class LoginService {
     constructor(private http:Http,private accountEventService:AccountEventsService,private router: Router) {
     }
-    authenticate(username:string,password:string):Observable<Account> {
+    authenticate(username:string,password:string, rememberMe: boolean):Observable<Account> {
 
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
 
-        return this.http.post(AppUtils.BACKEND_API_ROOT_URL+AppUtils.BACKEND_API_AUTHENTICATE_PATH, JSON.stringify({login:username,password:password}),{headers:headers})
+        return this.http.post(AppUtils.BACKEND_API_ROOT_URL+AppUtils.BACKEND_API_AUTHENTICATE_PATH,
+            JSON.stringify({login:username,password:password}),{headers:headers})
             .map((res:Response) => {
                 let securityToken:SecurityToken = new SecurityToken(
                     {
-                    publicSecret:res.headers.get(AppUtils.HEADER_X_SECRET),
+                    secret:res.headers.get(AppUtils.HEADER_X_SECRET),
                     securityLevel:res.headers.get(AppUtils.HEADER_WWW_AUTHENTICATE)
                     }
                 );
 
-                localStorage.setItem(AppUtils.CSRF_CLAIM_HEADER, res.headers.get(AppUtils.CSRF_CLAIM_HEADER));
-                localStorage.setItem(AppUtils.STORAGE_ACCOUNT_TOKEN,res.text());
-                localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN,JSON.stringify(securityToken));
+                if(rememberMe) {
+                    localStorage.setItem(AppUtils.STORAGE_ACCOUNT_TOKEN, res.text());
+                    localStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN, JSON.stringify(securityToken));
+                } else {
+                    sessionStorage.setItem(AppUtils.STORAGE_ACCOUNT_TOKEN, res.text());
+                    sessionStorage.setItem(AppUtils.STORAGE_SECURITY_TOKEN, JSON.stringify(securityToken));
+                }
 
                 let account:Account = new Account(res.json());
                 this.sendLoginSuccess(account);
@@ -37,45 +42,51 @@ export class LoginService {
     }
     sendLoginSuccess(account?:Account):void {
         if(!account) {
-            account = new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN)));
+            account = new Account(JSON.parse(this.getAccountFromStorage()));
         }
         this.accountEventService.loginSuccess(account);
     }
     isAuthenticated():boolean {
-        return !!localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
+        return !!this.getAccountFromStorage();
     }
     removeAccount():void {
         localStorage.removeItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
         localStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
-        localStorage.removeItem(AppUtils.CSRF_CLAIM_HEADER);
+
+        sessionStorage.removeItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
+        sessionStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
     }
-    logout(callServer:boolean = true):void {
+    logout():void {
         console.log('Logging out');
 
-        if(callServer) {
-            this.http.get(AppUtils.BACKEND_API_ROOT_URL + '/logout').subscribe(() => {
-                this.accountEventService.logout(new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN))));
-                this.removeAccount();
-                this.router.navigate(['/authenticate']);
-            });
-        } else {
-            this.removeAccount();
-            this.router.navigate(['/authenticate']);
-        }
+        this.removeAccount();
+        this.router.navigate(['/authenticate']);
     }
     isAuthorized(roles:Array<string>):boolean {
-        let authorized:boolean = false;
         if(this.isAuthenticated() && roles) {
-            let account:Account = new Account(JSON.parse(localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN)));
-            if(account && account.authorities) {
-
+            let account:Account = new Account(JSON.parse(this.getAccountFromStorage()));
+            if(account && account.profile) {
+                let isValid = true;
                 roles.forEach((role:string) => {
-                    if(account.authorities.indexOf(role) !== -1) {
-                        authorized = true;
+                    let filteredAuth: Array<any> = account.profile.authorities.filter(a => {
+                        return a.name === role;
+                    });
+
+                    if(filteredAuth.length === 0) {
+                        isValid = false;
                     }
                 });
+
+                return isValid;
             }
         }
-        return authorized;
+        return false;
+    }
+    getAccountFromStorage(): any {
+        let account: any = localStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
+        if(!account) {
+            return sessionStorage.getItem(AppUtils.STORAGE_ACCOUNT_TOKEN);
+        }
+        return account;
     }
 }

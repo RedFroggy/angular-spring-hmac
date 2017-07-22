@@ -1,41 +1,51 @@
 package fr.redfroggy.hmac.service;
 
-import fr.redfroggy.hmac.configuration.security.SecurityUser;
-import fr.redfroggy.hmac.configuration.security.hmac.*;
+import fr.redfroggy.hmac.configuration.SecurityProperties;
+import fr.redfroggy.hmac.configuration.security.SecurityUtils;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacToken;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
+import fr.redfroggy.hmac.domain.User;
 import fr.redfroggy.hmac.dto.LoginDTO;
 import fr.redfroggy.hmac.dto.UserDTO;
-import fr.redfroggy.hmac.mock.MockUsers;
+import fr.redfroggy.hmac.mapper.UserMapper;
+import fr.redfroggy.hmac.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Authentication service
  * Created by Michael DESIGAUD on 15/02/2016.
  */
 @Service
+@SuppressWarnings("unchecked")
 public class AuthenticationService {
 
-    public static final String JWT_APP_COOKIE = "hmac-app-jwt";
-    public static final String CSRF_CLAIM_HEADER = "X-HMAC-CSRF";
+    public static final String ACCESS_TOKEN_COOKIE = "access_token";
     public static final String JWT_CLAIM_LOGIN = "login";
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private SecurityProperties securityProperties;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * Authenticate a user in Spring Security
@@ -45,100 +55,46 @@ public class AuthenticationService {
      * - WWW-Authenticate: Used algorithm to encode secret
      * The authenticated user in set ine the Spring Security context
      * The generated secret is stored in a static list for every user
-     * @see MockUsers
      * @param loginDTO credentials
+     * @param request http request
      * @param response http response
-     * @return UserDTO instance
-     * @throws HmacException
+     * @return access token
+     * @throws HmacException hmac exception
      */
-    public UserDTO authenticate(LoginDTO loginDTO, HttpServletResponse response) throws HmacException {
+    public UserDTO authenticate(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws HmacException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getLogin(),loginDTO.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        //Retrieve security user after authentication
-        SecurityUser securityUser = (SecurityUser) userDetailsService.loadUserByUsername(loginDTO.getLogin());
-
-        //Parse Granted authorities to a list of string authorities
-        List<String> authorities = new ArrayList<>();
-        for(GrantedAuthority authority : securityUser.getAuthorities()){
-            authorities.add(authority.getAuthority());
-        }
-
         //Get Hmac signed token
-        String csrfId = UUID.randomUUID().toString();
         Map<String,String> customClaims = new HashMap<>();
-        customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
+        customClaims.put(SecurityUtils.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
         customClaims.put(JWT_CLAIM_LOGIN, loginDTO.getLogin());
-        customClaims.put(CSRF_CLAIM_HEADER, csrfId);
 
-        //Generate a random secret
-        String privateSecret = HmacSigner.generateSecret();
-        String publicSecret = HmacSigner.generateSecret();
+        //Get jwt secret from properties
+        String jwtSecret = securityProperties.getJwt().getSecret();
 
-        // Jwt is generated using the private key
-        HmacToken hmacToken = HmacSigner.getSignedToken(privateSecret,String.valueOf(securityUser.getId()), HmacSecurityFilter.JWT_TTL,customClaims);
+        //Get hmac secret from config
+        String hmacSharedSecret = securityProperties.getHmac().getSecret();
 
-        for(UserDTO userDTO : MockUsers.getUsers()){
-            if(userDTO.getId().equals(securityUser.getId())){
-                //Store in cache both private an public secrets
-                userDTO.setPublicSecret(publicSecret);
-                userDTO.setPrivateSecret(privateSecret);
-            }
-        }
+        // Jwt is generated using the secret defined in configuration file
+        HmacToken hmacToken = SecurityUtils.getSignedToken(jwtSecret,loginDTO.getLogin(), SecurityService.JWT_TTL,customClaims);
 
-        // Add jwt cookie
-        Cookie jwtCookie = new Cookie(JWT_APP_COOKIE,hmacToken.getJwt());
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(20*60);
+        // Add jwt as a cookie
+        Cookie jwtCookie = new Cookie(ACCESS_TOKEN_COOKIE,hmacToken.getJwt());
+        jwtCookie.setPath(request.getContextPath().length() > 0 ? request.getContextPath() : "/");
+        jwtCookie.setMaxAge(securityProperties.getJwt().getMaxAge());
         //Cookie cannot be accessed via JavaScript
         jwtCookie.setHttpOnly(true);
 
-        // Set public secret and encoding in headers
-        response.setHeader(HmacUtils.X_SECRET, publicSecret);
+        // Add shared secret and encoding method in headers
+        response.setHeader(HmacUtils.X_SECRET, hmacSharedSecret);
         response.setHeader(HttpHeaders.WWW_AUTHENTICATE, HmacUtils.HMAC_SHA_256);
-        response.setHeader(CSRF_CLAIM_HEADER, csrfId);
 
         //Set JWT as a cookie
         response.addCookie(jwtCookie);
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(securityUser.getId());
-        userDTO.setLogin(securityUser.getUsername());
-        userDTO.setAuthorities(authorities);
-        userDTO.setProfile(securityUser.getProfile());
-        return userDTO;
-    }
-
-    /**
-     * Logout a user
-     * - Clear the Spring Security context
-     * - Remove the stored UserDTO secret
-     */
-    public void logout(){
-        if(SecurityContextHolder.getContext().getAuthentication() != null
-                && SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
-        {
-            SecurityUser securityUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-            UserDTO userDTO = MockUsers.findById(securityUser.getId());
-            if(userDTO != null){
-                userDTO.setPublicSecret(null);
-            }
-
-        }
-    }
-
-    /**
-     * Authentication for every request
-     * - Triggered by every http request except the authentication
-     * @see fr.redfroggy.hmac.configuration.security.XAuthTokenFilter
-     * Set the authenticated user in the Spring Security context
-     * @param username username
-     */
-    public void tokenAuthentication(String username){
-        UserDetails details = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(details, details.getPassword(), details.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        User user = userRepository.findByLogin(loginDTO.getLogin());
+        return userMapper.userToUserDTO(user);
     }
 }

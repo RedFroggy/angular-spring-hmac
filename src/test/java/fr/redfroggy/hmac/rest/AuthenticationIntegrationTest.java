@@ -2,32 +2,31 @@ package fr.redfroggy.hmac.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.redfroggy.hmac.ApplicationTest;
-import fr.redfroggy.hmac.configuration.security.hmac.HmacSigner;
+import fr.redfroggy.hmac.Application;
+import fr.redfroggy.hmac.configuration.security.SecurityUtils;
 import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
 import fr.redfroggy.hmac.dto.LoginDTO;
-import fr.redfroggy.hmac.dto.Profile;
 import fr.redfroggy.hmac.dto.UserDTO;
-import org.apache.commons.codec.binary.Base64;
+import fr.redfroggy.hmac.service.AuthenticationService;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
+import javax.servlet.http.Cookie;
 import java.io.IOException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,13 +37,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Authentication integration unit tests
  * Created by Michael DESIGAUD on 16/02/2016.
  */
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ApplicationTest.class)
-@WebAppConfiguration
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Application.class)
 @ActiveProfiles("test")
 public class AuthenticationIntegrationTest {
+    
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationIntegrationTest.class);
 
     @Autowired
     private WebApplicationContext context;
@@ -68,9 +67,9 @@ public class AuthenticationIntegrationTest {
      *
      * @param login    username
      * @param password password
-     * @throws Exception
+     * @throws Exception exception
      */
-    public MvcResult authenticate(String login, String password,int status) throws Exception {
+    private MvcResult authenticate(String login, String password,int status) throws Exception {
         //Post parameters
         LoginDTO loginDTO = new LoginDTO();
         loginDTO.setLogin(login);
@@ -88,22 +87,31 @@ public class AuthenticationIntegrationTest {
 
         if(result.getResponse().getStatus() == 200) {
             Assert.assertTrue(!result.getResponse().getHeader(HmacUtils.X_SECRET).isEmpty());
-            Assert.assertTrue(!result.getResponse().getHeader(HmacUtils.X_TOKEN_ACCESS).isEmpty());
+
+            Cookie jwtCookie = result.getResponse().getCookie(AuthenticationService.ACCESS_TOKEN_COOKIE);
+            Assert.assertNotNull(jwtCookie);
+            Assert.assertTrue(!jwtCookie.getValue().isEmpty());
         }
 
         return result;
     }
 
-    public void logout(MvcResult result,int status) throws Exception{
+    private void logout(MvcResult result,int status) throws Exception{
 
-        String secret = new String(Base64.decodeBase64(result.getResponse().getHeader(HmacUtils.X_SECRET).trim().getBytes()));
-        String jwtToken = result.getResponse().getHeader(HmacUtils.X_TOKEN_ACCESS);
+        String secret = result.getResponse().getHeader(HmacUtils.X_SECRET).trim();
+
+        Cookie jwtCookie = result.getResponse().getCookie(AuthenticationService.ACCESS_TOKEN_COOKIE);
+
         String date = DateTime.now().toDateTimeISO().toString();
         String message = "GEThttp://localhost/api/logout"+date;
-        String digest = HmacSigner.encodeMac(secret, message, HmacUtils.HMAC_SHA_256);
+        String digest = SecurityUtils.encodeMac(secret, message, HmacUtils.HMAC_SHA_256);
+
+        logger.debug("HMAC Message client: {}", message);
+        logger.debug("HMAC Secret client: {}", secret);
+        logger.debug("HMAC Digest client: {}", digest);
 
         mockMVC.perform(get("/api/logout", false)
-                .header(HmacUtils.AUTHENTICATION, jwtToken)
+                .cookie(jwtCookie)
                 .header(HmacUtils.X_DIGEST, digest)
                 .header(HmacUtils.X_ONCE, date)
                 //Content
@@ -120,9 +128,7 @@ public class AuthenticationIntegrationTest {
         Assert.assertNotNull(userDTO);
         Assert.assertNotNull(userDTO.getLogin());
         Assert.assertNull(userDTO.getPassword());
-        Assert.assertNotNull(userDTO.getAuthorities());
         Assert.assertNotNull(userDTO.getProfile());
-        Assert.assertEquals(userDTO.getProfile(), Profile.ADMIN);
     }
 
     @Test
@@ -132,9 +138,7 @@ public class AuthenticationIntegrationTest {
         Assert.assertNotNull(userDTO);
         Assert.assertNotNull(userDTO.getLogin());
         Assert.assertNull(userDTO.getPassword());
-        Assert.assertNotNull(userDTO.getAuthorities());
         Assert.assertNotNull(userDTO.getProfile());
-        Assert.assertEquals(userDTO.getProfile(), Profile.USER);
     }
 
     @Test

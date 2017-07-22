@@ -2,6 +2,7 @@ package fr.redfroggy.hmac.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import fr.redfroggy.hmac.domain.Authority;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
 
-    private Integer id;
+    private Long id;
 
     @NotEmpty
     private String login;
@@ -21,39 +22,14 @@ public class UserDTO {
     @JsonIgnore
     private String password;
 
-    @NotEmpty
-    private List<String> authorities;
+    private ProfileDTO profile;
 
-    @JsonIgnore
-    private String publicSecret;
-
-    @JsonIgnore
-    private String privateSecret;
-
-    private Profile profile;
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(Profile profile) {
-        this.profile = profile;
-    }
-
-    public List<String> getAuthorities() {
-        return authorities;
-    }
-
-    public void setAuthorities(List<String> authorities) {
-        this.authorities = authorities;
     }
 
     public String getLogin() {
@@ -72,19 +48,11 @@ public class UserDTO {
         this.password = password;
     }
 
-    public String getPublicSecret() {
-        return publicSecret;
+    public ProfileDTO getProfile() {
+        return profile;
     }
 
-    public void setPublicSecret(String publicSecret) {
-        this.publicSecret = publicSecret;
-    }
-
-    public void setPrivateSecret(String privateSecret) {
-        this.privateSecret = privateSecret;
-    }
-
-    public String getPrivateSecret() {
-        return privateSecret;
+    public void setProfile(ProfileDTO profile) {
+        this.profile = profile;
     }
 }

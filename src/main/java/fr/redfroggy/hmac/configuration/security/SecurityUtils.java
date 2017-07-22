@@ -1,4 +1,4 @@
-package fr.redfroggy.hmac.configuration.security.hmac;
+package fr.redfroggy.hmac.configuration.security;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -7,6 +7,8 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacToken;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 
@@ -18,10 +20,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Hmac signer
+ * Security utility class
  * Created by Michael DESIGAUD on 15/02/2016.
  */
-public class HmacSigner {
+public class SecurityUtils {
 
     public static final String ENCODING_CLAIM_PROPERTY = "l-lev";
 
@@ -33,9 +35,9 @@ public class HmacSigner {
      * @param ttl time to live (in seconds
      * @param claims Custom properties to store in the JWT
      * @return HmacToken instance
-     * @throws HmacException
+     * @throws HmacException hmac exception
      */
-    public static HmacToken getSignedToken(String secret, String iss, Integer ttl,Map<String,String> claims) throws HmacException{
+    public static HmacToken getSignedToken(String secret, String iss, Integer ttl, Map<String,String> claims) throws HmacException{
 
         //Generate a random token
         String jwtID = generateToken();
@@ -56,7 +58,7 @@ public class HmacSigner {
 
     /**
      * Generate a random secret (base on uuid) and encoded in base 64
-     * @throws HmacException
+     * @throws HmacException hmac exception
      * @return a random secret
      */
     public static String generateSecret() throws HmacException {
@@ -94,9 +96,9 @@ public class HmacSigner {
      * @param iss issuer
      * @param claims List of custom claims
      * @return A signed json web token
-     * @throws JOSEException
+     * @throws JOSEException exception
      */
-    public static String signJWT(String secret, String jwtID, Integer ttl,String iss, Map<String,String> claims) throws JOSEException {
+    private static String signJWT(String secret, String jwtID, Integer ttl,String iss, Map<String,String> claims) throws JOSEException {
         JWSSigner jwsSigner = new MACSigner(secret.getBytes());
 
         //Create a new claim
@@ -126,7 +128,7 @@ public class HmacSigner {
      * Check JWT is expired
      * @param jwtString JWT string representation
      * @return true if expired, false otherwise
-     * @throws ParseException
+     * @throws ParseException parse exception
      */
     public static Boolean isJwtExpired(String jwtString) throws ParseException {
         JWT jwt = JWTParser.parse(jwtString);
@@ -142,7 +144,7 @@ public class HmacSigner {
      * @param jwt jwt
      * @param secret shared secret
      * @return true if the JWT is valid, false otherwise
-     * @throws HmacException
+     * @throws HmacException hmac exception
      */
     public static Boolean verifyJWT(final String jwt, final String secret) throws HmacException {
         try {
@@ -160,7 +162,7 @@ public class HmacSigner {
      * @param jwt      json web token
      * @param claimKey claim key of the property to retrieve
      * @return property value
-     * @throws HmacException
+     * @throws HmacException hmac exception
      */
     public static String getJwtClaim(final String jwt, final String claimKey) throws HmacException {
         try {
@@ -179,7 +181,7 @@ public class HmacSigner {
      *
      * @param jwt json web token
      * @return iss property from claim
-     * @throws HmacException
+     * @throws HmacException hmac exception
      */
     public static String getJwtIss(final String jwt) throws HmacException {
         try {
@@ -199,7 +201,7 @@ public class HmacSigner {
      * @param message   message to sign
      * @param algorithm algorithm ued to sign
      * @return an HMAC encoded string
-     * @throws HmacException
+     * @throws HmacException hmac exception
      */
     public static String encodeMac(final String secret, final String message, final String algorithm) throws HmacException {
         String digest;
