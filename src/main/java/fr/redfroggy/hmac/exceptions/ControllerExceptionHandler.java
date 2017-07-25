@@ -20,6 +20,13 @@ public class ControllerExceptionHandler {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(Exception.class)
+    public ErrorDTO handleGlobalException(Exception ex, HttpServletRequest request) {
+        return handleErrorDTO(ex, request, HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
     public ErrorDTO handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest request) {
         return handleErrorDTO(ex, request, HttpStatus.NOT_FOUND.value());

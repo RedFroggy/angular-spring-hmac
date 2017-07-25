@@ -1,6 +1,9 @@
 package fr.redfroggy.hmac.configuration.security;
 
-import fr.redfroggy.hmac.configuration.security.hmac.*;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacSecurityFilter;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacToken;
+import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
 import fr.redfroggy.hmac.service.AuthenticationService;
 import fr.redfroggy.hmac.service.SecurityService;
 import org.joda.time.DateTime;
@@ -68,17 +71,6 @@ public class HmacSecurityFilterTest {
      * do filter unit tests
      */
     @Test
-    public void doFilterNoHmac() throws IOException, ServletException {
-
-        hmacSecurityFilter.doFilter(request,response,filterChain);
-
-        Mockito.verify(filterChain,Mockito.times(1)).doFilter(Mockito.any(WrappedRequest.class),Mockito.any(HttpServletResponse.class));
-    }
-
-    /**
-     * do filter unit tests
-     */
-    @Test
     public void doFilterHmac() throws IOException, ServletException, HmacException {
 
         Cookie jwtCookie = new Cookie(AuthenticationService.ACCESS_TOKEN_COOKIE,hmacToken.getJwt());
@@ -92,6 +84,7 @@ public class HmacSecurityFilterTest {
         Mockito.when(request.getHeader(HmacUtils.X_DIGEST)).thenReturn(getDigest());
         Mockito.when(request.getHeader(HmacUtils.X_ONCE)).thenReturn(isoDate);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(url));
+        Mockito.when(request.getRequestURI()).thenReturn("/index.html");
         Mockito.when(request.getQueryString()).thenReturn(null);
         Mockito.when(request.getMethod()).thenReturn("GET");
 

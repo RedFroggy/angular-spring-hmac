@@ -7,11 +7,16 @@
 - Angular 4.1.2
 
 #Features
-- Token based authentication
-- Json Web Token  
+- Use of cookies to store JWT and xsrf token
+- Token based authentication (JWT)
 - HMAC implementation
 - HMAC Filter used by Spring Security
 - HMAC implementation in Angular 4
+
+#Users
+- All users are stored in an H2 in memory database
+- Default data are loaded using liquibase
+
 
 #Credentials
 admin/frog => role ADMIN

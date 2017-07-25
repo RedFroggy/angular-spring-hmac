@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,7 +30,6 @@ import javax.servlet.Filter;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -75,13 +75,15 @@ public class AuthenticationIntegrationTest {
         loginDTO.setLogin(login);
         loginDTO.setPassword(password);
 
-        MvcResult result   = mockMVC.perform(post("/api/authenticate", false)//
+        MvcResult result   = mockMVC
+                .perform(post("/api/authenticate")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 //Content
                 .contentType(MediaType.APPLICATION_JSON)//
                 .content(toJSON(loginDTO)))//
                 //Fin content
                 //Assertions
-                .andExpect(status().is(status)).andReturn();
+                .andReturn();
 
         Assert.assertNotNull(result);
 
@@ -96,7 +98,7 @@ public class AuthenticationIntegrationTest {
         return result;
     }
 
-    private void logout(MvcResult result,int status) throws Exception{
+    private void logout(MvcResult result) throws Exception{
 
         String secret = result.getResponse().getHeader(HmacUtils.X_SECRET).trim();
 
@@ -110,15 +112,16 @@ public class AuthenticationIntegrationTest {
         logger.debug("HMAC Secret client: {}", secret);
         logger.debug("HMAC Digest client: {}", digest);
 
-        mockMVC.perform(get("/api/logout", false)
+        mockMVC.perform(post("/api/logout", false)
                 .cookie(jwtCookie)
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .header(HmacUtils.X_DIGEST, digest)
                 .header(HmacUtils.X_ONCE, date)
                 //Content
                 .contentType(MediaType.APPLICATION_JSON))//
                 //Fin content
                 //Assertions
-                .andExpect(status().is(status)).andReturn();
+                .andExpect(status().isOk()).andReturn();
     }
 
     @Test
@@ -149,7 +152,7 @@ public class AuthenticationIntegrationTest {
     @Test
     public void logoutSuccess() throws Exception {
         MvcResult result = authenticate("admin","frog",200);
-        logout(result,200);
+        logout(result);
     }
 
     private String toJSON(Object obj) throws JsonProcessingException {

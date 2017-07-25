@@ -1,9 +1,9 @@
 package fr.redfroggy.hmac.configuration.security;
 
 import fr.redfroggy.hmac.configuration.security.hmac.HmacSecurityConfigurer;
+import fr.redfroggy.hmac.service.AuthenticationService;
 import fr.redfroggy.hmac.service.HmacUserDetailsService;
 import fr.redfroggy.hmac.service.SecurityService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,16 +24,19 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+
+    private SecurityService securityService;
+    private HmacUserDetailsService userDetailsService;
+
+    public SecurityConfiguration(SecurityService securityService, HmacUserDetailsService userDetailsService){
+        this.securityService = securityService;
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-    @Autowired
-    private SecurityService securityService;
-
-    @Autowired
-    private HmacUserDetailsService userDetailsService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -50,23 +53,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                    .antMatchers("/api/authenticate").permitAll()
-                    .antMatchers("/favicon.ico").permitAll()
-                    .antMatchers("/api/**").authenticated()
-                .and()
-                .csrf()
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .and()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+            .authorizeRequests()
+                .antMatchers("/api/logout").permitAll()
+                .antMatchers("/api/authenticate").permitAll()
+                .antMatchers("/api/**").authenticated()
+            .and()
+            .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
                 .logout()
-                    .permitAll()
-                .and()
-                    .apply(authTokenConfigurer())
-                .and()
-                    .apply(hmacSecurityConfigurer());
+                .logoutUrl("/api/logout")
+                .logoutSuccessHandler(new AjaxLogoutSuccessHandler())
+                .deleteCookies(AuthenticationService.ACCESS_TOKEN_COOKIE)
+                .permitAll()
+            .and()
+                .apply(authTokenConfigurer())
+            .and()
+                .apply(hmacSecurityConfigurer());
     }
 
     @Override
@@ -75,7 +81,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
-;
+
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

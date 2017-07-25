@@ -4,7 +4,6 @@ import fr.redfroggy.hmac.domain.Profile;
 import fr.redfroggy.hmac.dto.UserDTO;
 import fr.redfroggy.hmac.repository.ProfileRepository;
 import fr.redfroggy.hmac.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,12 +16,14 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api")
 public class UsersController {
-
-    @Autowired
+    
     private UserService userService;
-
-    @Autowired
     private ProfileRepository profileRepository;
+
+    public UsersController(UserService userService, ProfileRepository profileRepository) {
+        this.userService = userService;
+        this.profileRepository = profileRepository;
+    }
 
     @GetMapping("/users")
     public List<UserDTO> query(){

@@ -1,7 +1,6 @@
 package fr.redfroggy.hmac.configuration.security;
 
 import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
-import fr.redfroggy.hmac.service.AuthenticationService;
 import fr.redfroggy.hmac.service.SecurityService;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -22,7 +21,7 @@ public class XAuthTokenFilter extends GenericFilterBean{
 
     private SecurityService securityService;
 
-    public XAuthTokenFilter(SecurityService securityService){
+    XAuthTokenFilter(SecurityService securityService){
        this.securityService = securityService;
     }
 

@@ -5,10 +5,8 @@ import fr.redfroggy.hmac.configuration.security.SecurityUtils;
 import fr.redfroggy.hmac.configuration.security.WrappedRequest;
 import fr.redfroggy.hmac.configuration.security.hmac.HmacException;
 import fr.redfroggy.hmac.configuration.security.hmac.HmacUtils;
-import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +17,9 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
 /**
@@ -31,16 +29,17 @@ import java.text.ParseException;
  */
 @Service
 public class SecurityService {
-    
+
+    static final Integer JWT_TTL = 20;
     private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
-    @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
     private SecurityProperties securityProperties;
 
-    public static final Integer JWT_TTL = 20;
+    public SecurityService(UserDetailsService userDetailsService, SecurityProperties securityProperties) {
+        this.userDetailsService = userDetailsService;
+        this.securityProperties = securityProperties;
+    }
 
     /**
      * Verify the JWT in current http request
@@ -66,12 +65,11 @@ public class SecurityService {
     /**
      * Verify the hmac request
      * @param request current http request
-     * @param response current http response
      * @return true if valid, false otherwise
      * @throws HmacException hmac exception
      * @throws IOException io exception
      */
-    public boolean verifyHmac(WrappedRequest request, HttpServletResponse response) throws HmacException, IOException {
+    public boolean verifyHmac(WrappedRequest request) throws HmacException, IOException {
 
         //Get Authentication header
         Cookie jwtCookie = WebUtils.getCookie(request, AuthenticationService.ACCESS_TOKEN_COOKIE);
@@ -98,11 +96,10 @@ public class SecurityService {
 
         String url = request.getRequestURL().toString();
         if (request.getQueryString() != null) {
-            url += "?" + URLDecoder.decode(request.getQueryString(), Charsets.UTF_8.displayName());
+            url += "?" + URLDecoder.decode(request.getQueryString(), StandardCharsets.UTF_8.displayName());
         }
 
         String encoding = SecurityUtils.getJwtClaim(jwt, SecurityUtils.ENCODING_CLAIM_PROPERTY);
-        String userId = SecurityUtils.getJwtIss(jwt);
 
         //Get hmac secret from config
         String hmacSharedSecret = securityProperties.getHmac().getSecret();

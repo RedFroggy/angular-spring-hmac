@@ -14,7 +14,7 @@ public class XAuthTokenConfigurer extends SecurityConfigurerAdapter<DefaultSecur
 
     private SecurityService securityService;
 
-    public XAuthTokenConfigurer(SecurityService securityService){
+    XAuthTokenConfigurer(SecurityService securityService){
         this.securityService = securityService;
     }
 

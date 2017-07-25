@@ -1,0 +1,58 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="michael (generated)" id="1500746171061-1">
+        <createSequence sequenceName="hibernate_sequence"/>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-2">
+        <createTable tableName="PROFILE_AUTHORITY">
+            <column name="profile_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-3">
+        <createTable tableName="authority">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="authorityPK"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-4">
+        <createTable tableName="profile">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="profilePK"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-5">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="userPK"/>
+            </column>
+            <column name="login" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="profile_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-6">
+        <addForeignKeyConstraint baseColumnNames="authority_id" baseTableName="PROFILE_AUTHORITY" constraintName="FK8dwi49l50qmwm1pt6l2cvbdgt" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="authority"/>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-7">
+        <addForeignKeyConstraint baseColumnNames="profile_id" baseTableName="PROFILE_AUTHORITY" constraintName="FKa2x1wvj3pd5gnjwtviqqqv3kd" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="profile"/>
+    </changeSet>
+    <changeSet author="michael (generated)" id="1500746171061-8">
+        <addForeignKeyConstraint baseColumnNames="profile_id" baseTableName="user" constraintName="FKof44u64o1d7scaukghm9veo23" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="profile"/>
+    </changeSet>
+
+    <changeSet author="michael (generated)" id="1500746171061-9">
+        <loadData tableName="authority" file="liquibase/data/authorities.csv" separator=";" relativeToChangelogFile="false" />
+        <loadData tableName="profile" file="liquibase/data/profile.csv" separator=";" relativeToChangelogFile="false" />
+        <loadData tableName="PROFILE_AUTHORITY" file="liquibase/data/profile_authorities.csv" separator=";" relativeToChangelogFile="false" />
+        <loadData tableName="user" file="liquibase/data/users.csv" separator=";" relativeToChangelogFile="false" />
+    </changeSet>
+</databaseChangeLog>

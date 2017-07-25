@@ -2,10 +2,7 @@ package fr.redfroggy.hmac.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import fr.redfroggy.hmac.domain.Authority;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import java.util.List;
 
 /**
  * User DTO

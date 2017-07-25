@@ -40,7 +40,7 @@ public class HmacSecurityFilter extends GenericFilterBean {
             if (!request.getRequestURI().contains("/api") || request.getRequestURI().contains("/api/authenticate")) {
                 filterChain.doFilter(wrappedRequest, response);
             } else {
-                if(securityService.verifyHmac(wrappedRequest, response)) {
+                if(securityService.verifyHmac(wrappedRequest)) {
                     filterChain.doFilter(wrappedRequest, response);
                 }
             }

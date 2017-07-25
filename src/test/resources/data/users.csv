@@ -1,0 +1,4 @@
+id;login;password;profile_id
+1;admin;$2a$10$PuwbMBIWWm/xFCLwtxmwjezRg/weOuBuqhSSi0WLdIgi0VldTHA4e;1
+2;manager;$2a$10$PuwbMBIWWm/xFCLwtxmwjezRg/weOuBuqhSSi0WLdIgi0VldTHA4e;2
+3;user;$2a$10$PuwbMBIWWm/xFCLwtxmwjezRg/weOuBuqhSSi0WLdIgi0VldTHA4e;3

@@ -22,8 +22,8 @@ export class LoginService {
             .map((res:Response) => {
                 let securityToken:SecurityToken = new SecurityToken(
                     {
-                    secret:res.headers.get(AppUtils.HEADER_X_SECRET),
-                    securityLevel:res.headers.get(AppUtils.HEADER_WWW_AUTHENTICATE)
+                        secret:res.headers.get(AppUtils.HEADER_X_SECRET),
+                        securityLevel:res.headers.get(AppUtils.HEADER_WWW_AUTHENTICATE)
                     }
                 );
 
@@ -38,7 +38,7 @@ export class LoginService {
                 let account:Account = new Account(res.json());
                 this.sendLoginSuccess(account);
                 return account;
-            });
+            })
     }
     sendLoginSuccess(account?:Account):void {
         if(!account) {
@@ -57,10 +57,16 @@ export class LoginService {
         sessionStorage.removeItem(AppUtils.STORAGE_SECURITY_TOKEN);
     }
     logout():void {
-        console.log('Logging out');
+        console.log('Logging out', AppUtils.BACKEND_API_ROOT_URL+AppUtils.BACKEND_API_LOGOUT_PATH);
 
-        this.removeAccount();
-        this.router.navigate(['/authenticate']);
+        this.http.post(AppUtils.BACKEND_API_ROOT_URL+AppUtils.BACKEND_API_LOGOUT_PATH, null)
+            .subscribe(() => {
+                this.http.get(AppUtils.BACKEND_API_ROOT_URL+AppUtils.BACKEND_API_AUTHENTICATE_PATH)
+                    .subscribe(() => {
+                        this.removeAccount();
+                        this.router.navigate(['/authenticate']);
+                    });
+            });
     }
     isAuthorized(roles:Array<string>):boolean {
         if(this.isAuthenticated() && roles) {

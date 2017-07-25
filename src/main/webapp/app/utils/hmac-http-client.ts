@@ -28,7 +28,7 @@ export class HmacHttpClient extends Http {
             let secret:string = securityToken.secret;
 
             let message = '';
-            if (method === 'PUT' || method === 'POST' || method === 'PATCH') {
+            if (body !== null && body !== '' && (method === 'PUT' || method === 'POST' || method === 'PATCH')) {
                message = method + body + url + date;
             } else {
                 message = method + url + date;

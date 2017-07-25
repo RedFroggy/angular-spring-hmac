@@ -6,7 +6,6 @@ import fr.redfroggy.hmac.exceptions.UserNotFoundException;
 import fr.redfroggy.hmac.mapper.ProfileMapper;
 import fr.redfroggy.hmac.mapper.UserMapper;
 import fr.redfroggy.hmac.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +20,15 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private UserMapper userMapper;
-
-    @Autowired
     private ProfileMapper profileMapper;
+
+    public UserService(UserRepository userRepository, UserMapper userMapper, ProfileMapper profileMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.profileMapper = profileMapper;
+    }
 
     public List<UserDTO> getUsers() {
         List<User> users =  userRepository.findAll();
