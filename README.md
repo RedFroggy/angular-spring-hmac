@@ -1,4 +1,4 @@
-# HMAC Implementation using Spring and Angular [![Build Status](https://travis-ci.org/RedFroggy/angular-spring-hmac.svg?branch=master)](https://travis-ci.org/RedFroggy/angular-spring-hmac)
+# Spring and Angular security with HMAC and Cookie based JWT [![Build Status](https://travis-ci.org/RedFroggy/angular-spring-hmac.svg?branch=master)](https://travis-ci.org/RedFroggy/angular-spring-hmac)
 
 # Stack
 - Spring Boot 1.5.4
