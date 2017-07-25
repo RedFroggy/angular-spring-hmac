@@ -1,34 +1,35 @@
-#HMAC Implementation using Spring and Angular [![Build Status](https://travis-ci.org/RedFroggy/angular-spring-hmac.svg?branch=master)](https://travis-ci.org/RedFroggy/angular-spring-hmac)
+# HMAC Implementation using Spring and Angular [![Build Status](https://travis-ci.org/RedFroggy/angular-spring-hmac.svg?branch=master)](https://travis-ci.org/RedFroggy/angular-spring-hmac)
 
-#Stack
+# Stack
 - Spring Boot 1.5.4
 - Spring 4.3.9
 - Spring Security 4.2.3
 - Angular 4.1.2
 
-#Features
+# Features
 - Use of cookies to store JWT and xsrf token
 - Token based authentication (JWT)
 - HMAC implementation
 - HMAC Filter used by Spring Security
 - HMAC implementation in Angular 4
 
-#Users
+# Users
 - All users are stored in an H2 in memory database
 - Default data are loaded using liquibase
+- Both tables Profile and Authority are used to retrieve a user authority hierarchy
 
 
-#Credentials
-admin/frog => role ADMIN
-manager/frog => role MANAGER
-user/frog => role USER
+# Credentials
+- admin/frog => role ADMIN
+- manager/frog => role MANAGER
+- user/frog => role USER
 
-#To run Java unit tests
+# To run Java unit tests
 ````bash
 $ mvn test
 ````
 
-#To run the application
+# To run the application
 ````bash
 $ mvn spring-boot:run
 ````

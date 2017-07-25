@@ -2,7 +2,4 @@ language: java
 jdk:
   - oraclejdk8
 install: true
-script:
-  - mvn clean
-  - mvn compile
-  - mvn test -P travis
+script: mvn clean test -P travis
