@@ -11,7 +11,7 @@
 - Token based authentication (JWT)
 - HMAC implementation
 - HMAC Filter used by Spring Security
-- HMAC implementation in Angular 4
+- HMAC implementation in Angular 5
 
 # Users
 - All users are stored in an H2 in memory database

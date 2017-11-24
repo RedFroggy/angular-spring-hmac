@@ -107,21 +107,4 @@ public class AuthenticationServiceTest {
         Mockito.verify(httpResponse,Mockito.times(2)).setHeader(Mockito.anyString(),Mockito.anyString());
         Mockito.verify(httpResponse,Mockito.times(1)).addCookie(Mockito.any(Cookie.class));
     }
-
-    @Test
-    public void authenticateByToken(){
-
-        LoginDTO loginDTO = new LoginDTO();
-        loginDTO.setLogin("admin");
-        loginDTO.setPassword("frog");
-
-        User securityUser = getSecurityUser(loginDTO.getLogin(),loginDTO.getPassword());
-        PowerMockito.when(userDetailsService.loadUserByUsername(loginDTO.getLogin())).thenReturn(securityUser);
-
-        Assert.assertNotNull(SecurityContextHolder.getContext());
-        Assert.assertNotNull(SecurityContextHolder.getContext().getAuthentication());
-        Assert.assertNotNull(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        Assert.assertNotNull(SecurityContextHolder.getContext().getAuthentication().getPrincipal().getClass().isAssignableFrom(User.class));
-        Assert.assertEquals(SecurityContextHolder.getContext().getAuthentication().getPrincipal(),loginDTO.getLogin());
-    }
 }
