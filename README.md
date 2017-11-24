@@ -4,7 +4,7 @@
 - Spring Boot 1.5.4
 - Spring 4.3.9
 - Spring Security 4.2.3
-- Angular 4.1.2
+- Angular 5.0.0
 
 # Features
 - Use of cookies to store JWT and xsrf token
