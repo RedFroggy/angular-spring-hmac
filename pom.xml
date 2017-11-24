@@ -24,6 +24,11 @@
         <powermock.version>1.6.4</powermock.version>
         <common-io.version>2.5</common-io.version>
         <java.version>1.8</java.version>
+        <cobertura-plugin.version>2.7</cobertura-plugin.version>
+        <coveralls-plugin.version>4.0.0</coveralls-plugin.version>
+        <frontend-plugin.version>0.0.27</frontend-plugin.version>
+        <node.version>v8.4.0</node.version>
+        <npm.version>5.3.0</npm.version>
     </properties>
 
     <dependencies>
@@ -126,36 +131,72 @@
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <version>${cobertura-plugin.version}</version>
+                        <configuration>
+                            <format>xml</format>
+                            <maxmem>256m</maxmem>
+                            <aggregate>true</aggregate>
+                            <instrumentation>
+                                <!-- Exclude JPA meta-model generated classes -->
+                                <ignores>
+                                    <ignore>**/*_.java</ignore>
+                                </ignores>
+                                <excludes>
+                                    <exclude>**/*_.class</exclude>
+                                </excludes>
+                            </instrumentation>
+                            <check/>
+                        </configuration>
+                    </plugin>
+                    <!-- Coveralls -->
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <version>${coveralls-plugin.version}</version>
+                        <configuration>
+                            <repoToken>your coveralls repository token goes here</repoToken>
+                        </configuration>
+                    </plugin>
+                    <!-- Frontend -->
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-plugin.version}</version>
+                        <configuration>
+                            <workingDirectory>src/main/static</workingDirectory>
+                            <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
+                            <nodeVersion>${node.version}</nodeVersion>
+                            <npmVersion>${npm.version}</npmVersion>
+                            <installDirectory>target</installDirectory>
+                        </configuration>
                         <executions>
                             <execution>
-                                <id>exec-npm-install</id>
-                                <phase>generate-sources</phase>
-                                <configuration>
-                                    <workingDirectory>${project.basedir}/src/main/webapp</workingDirectory>
-                                    <executable>npm</executable>
-                                    <arguments>
-                                        <argument>install</argument>
-                                    </arguments>
-                                </configuration>
+                                <id>install node and npm</id>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>install-node-and-npm</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                             </execution>
                             <execution>
-                                <id>exec-npm-run-tsc</id>
-                                <phase>generate-sources</phase>
-                                <configuration>
-                                    <workingDirectory>${project.basedir}/src/main/webapp</workingDirectory>
-                                    <executable>npm</executable>
-                                    <arguments>
-                                        <argument>run</argument>
-                                        <argument>build</argument>
-                                    </arguments>
-                                </configuration>
+                                <id>npm install</id>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>npm</goal>
                                 </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <installDirectory>target</installDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>angular cli build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -202,6 +243,11 @@
     </profiles>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/static/dist</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
